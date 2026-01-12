@@ -1,3 +1,6 @@
+# Quote
+"If today you are a little better than you were yesterday, then that is enough!" - David A. Bednar
+
 # SmartBudget  
 **Student Expense Tracking and Financial Planner**
 

@@ -1,16 +1,64 @@
-# React + Vite
+# SmartBudget  
+**Student Expense Tracking and Financial Planner**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SmartBudget is a web application designed to help students track expenses, manage budgets, and better understand their spending habits. The app focuses on simplicity, clarity, and real-world usefulness, allowing users to record daily expenses, organize them into categories, set weekly or monthly budgets, and view spending summaries through a clean dashboard.
 
-Currently, two official plugins are available:
+This project is being developed as part of **CSE 499 – Senior Project** using an Agile, sprint-based approach.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## Problem Statement
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+Students often juggle tuition, rent, food, transportation, and personal expenses with limited income. Because expenses accumulate quietly, it’s easy to lose track of spending and overshoot budgets without realizing it.
 
-## Expanding the ESLint configuration
+Most existing financial tools are either too complex or not tailored for student needs. SmartBudget aims to provide a **simple, student-friendly solution** that helps users stay aware of where their money is going and make more informed financial decisions.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## Core Features
+
+- Secure user authentication (register, login, logout)
+- Add, edit, and delete expenses
+- Categorize expenses (e.g., food, rent, transport)
+- Set weekly or monthly budgets
+- Dashboard summary showing spending vs. budget
+- Filter expenses by category and date
+
+---
+
+## Planned Enhancements
+
+- Visual charts (spending by category)
+- Export expense history (CSV)
+- Savings goal tracking
+- Dark mode / light mode
+- Accessibility and performance improvements
+
+> Final enhancement scope will be determined during sprint planning.
+
+---
+
+## Project Architecture
+
+SmartBudget follows a **client–server web architecture**:
+
+- **Frontend:** React (Vite)
+- **Backend:** Node.js with Express (REST API)
+- **Database:** PostgreSQL or MongoDB (TBD by team)
+- **Authentication:** JWT-based authentication
+- **Deployment:**
+  - Frontend: Vercel or Netlify
+  - Backend: Render
+- **Version Control:** GitHub
+- **Project Management:** Trello + Agile sprints
+
+---
+
+## Repository Structure
+
+```text
+smartbudget/
+├── client/        # React frontend (Vite)
+├── server/        # Express backend (to be implemented)
+├── README.md
+└── .gitignore

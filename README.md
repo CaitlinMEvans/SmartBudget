@@ -1,6 +1,6 @@
 # Quote
 "If today you are a little better than you were yesterday, then that is enough!" - David A. Bednar
-
+"Through determination and resilience, what once seemed impossible becomes inevitable."
 # SmartBudget  
 **Student Expense Tracking and Financial Planner**
 

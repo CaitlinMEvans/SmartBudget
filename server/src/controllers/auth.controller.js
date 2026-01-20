@@ -1,48 +1,85 @@
+// server/src/controllers/auth.controller.js
 import bcrypt from "bcrypt";
-import { createUser, findUserByEmail } from "../models/userStore.js";
-import { signToken } from "../utils/jwt.js";
+import jwt from "jsonwebtoken";
+import { createUser, findByEmail } from "../models/user.model.js";
 
 function isValidEmail(email) {
-  // simple and good enough for this scope
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || "").trim());
+}
+
+function getJwtConfig() {
+  const secret = process.env.JWT_SECRET;
+  const expiresIn = process.env.JWT_EXPIRES_IN || "7d";
+
+  if (!secret || secret.length < 16) {
+    // Don’t silently run with a weak secret
+    throw new Error("JWT_SECRET is missing or too short (need 16+ chars).");
+  }
+
+  return { secret, expiresIn };
 }
 
 export async function register(req, res) {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
 
-    // Validate input
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required." });
+      return res.status(400).json({ error: "Email and password are required." });
     }
     if (!isValidEmail(email)) {
-      return res.status(400).json({ message: "Invalid email format." });
+      return res.status(400).json({ error: "Invalid email format." });
     }
-    if (password.length < 8) {
-      return res.status(400).json({ message: "Password must be at least 8 characters." });
-    }
-
-    // Enforce unique email
-    const existing = findUserByEmail(email);
-    if (existing) {
-      return res.status(409).json({ message: "Email already in use." });
+    if (String(password).length < 8) {
+      return res.status(400).json({ error: "Password must be at least 8 characters." });
     }
 
-    // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create user
-    const user = createUser({
-      email: email.toLowerCase(),
-      passwordHash,
-    });
+    let user;
+    try {
+      user = createUser({ email, passwordHash });
+    } catch (err) {
+      if (err.code === "DUP_EMAIL") {
+        return res.status(409).json({ error: "Email already exists." });
+      }
+      throw err;
+    }
 
-    // Return JWT
-    const token = signToken({ userId: user.id, email: user.email });
+    const { secret, expiresIn } = getJwtConfig();
+    const token = jwt.sign({ userId: user.id }, secret, { expiresIn });
 
     return res.status(201).json({ token });
   } catch (err) {
     console.error("Register error:", err);
-    return res.status(500).json({ message: "Server error." });
+    return res.status(500).json({ error: "Server error." });
+  }
+}
+
+export async function login(req, res) {
+  try {
+    const { email, password } = req.body || {};
+
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required." });
+    }
+
+    const user = findByEmail(email);
+    if (!user) {
+      // Don’t reveal whether email exists
+      return res.status(401).json({ error: "Invalid credentials." });
+    }
+
+    const ok = await bcrypt.compare(password, user.passwordHash);
+    if (!ok) {
+      return res.status(401).json({ error: "Invalid credentials." });
+    }
+
+    const { secret, expiresIn } = getJwtConfig();
+    const token = jwt.sign({ userId: user.id }, secret, { expiresIn });
+
+    return res.status(200).json({ token });
+  } catch (err) {
+    console.error("Login error:", err);
+    return res.status(500).json({ error: "Server error." });
   }
 }

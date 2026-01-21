@@ -1,11 +1,30 @@
-import './App.css'
+import { Routes, Route } from "react-router-dom";
+import TopNav from "./components/TopNav";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import RequireAuth from "./auth/RequireAuth";
 
 function App() {
- return (
-    <div>
-      <h1>SmartBudget</h1>
-      <p>Student Expense Tracking and Financial Planner</p>
-    </div>
+  return (
+    <>
+      <TopNav />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        {/* Example protected route */}
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <Home />
+            </RequireAuth>
+          }
+        />
+      </Routes>
+    </>
   );
 }
 

@@ -1,13 +1,18 @@
-// client/src/auth/AuthContext.jsx
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem("token") || "");
+  const [token, setToken] = useState(() => localStorage.getItem("token") || null);
+
   const [user, setUser] = useState(() => {
-    const raw = localStorage.getItem("user");
-    return raw ? JSON.parse(raw) : null;
+    try {
+      const raw = localStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      localStorage.removeItem("user");
+      return null;
+    }
   });
 
   useEffect(() => {
@@ -21,12 +26,12 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   const login = ({ token, user }) => {
-    setToken(token || "");
+    setToken(token || null);
     setUser(user || null);
   };
 
   const logout = () => {
-    setToken("");
+    setToken(null);
     setUser(null);
   };
 

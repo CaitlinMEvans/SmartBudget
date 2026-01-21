@@ -7,7 +7,7 @@ export default function TopNav() {
 
   function handleLogout() {
     logout();
-    navigate("/login");
+    navigate("/login", { replace: true });
   }
 
   return (
@@ -29,7 +29,7 @@ export default function TopNav() {
             </Link>
           </>
         ) : (
-          <button onClick={handleLogout} style={styles.button}>
+          <button type="button" onClick={handleLogout} style={styles.button}>
             Logout
           </button>
         )}

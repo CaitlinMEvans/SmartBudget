@@ -1,29 +1,44 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { loginUser } from "../api/authApi";
 
 export default function Login() {
   const nav = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const redirectTo = location.state?.from || "/";
 
   async function onSubmit(e) {
     e.preventDefault();
     setError("");
 
-    if (!email.includes("@")) return setError("Enter a valid email.");
+    const emailTrim = email.trim();
+
+    if (!emailTrim) return setError("Email is required.");
+    if (!emailTrim.includes("@")) return setError("Enter a valid email.");
     if (!password) return setError("Password is required.");
 
     try {
-      const data = await loginUser({ email, password }); // expects { token, user? }
-      login({ token: data.token, user: data.user || { email } });
-      nav("/");
+      setLoading(true);
+      const data = await loginUser({ email: emailTrim, password }); // expects { token, user? }
+      login({ token: data.token, user: data.user || { email: emailTrim } });
+      nav(redirectTo, { replace: true });
     } catch (err) {
-      setError(err.message || "Login failed.");
+      // If backend sends Zod-style details: [{ field, message }, ...]
+      if (Array.isArray(err.details) && err.details.length) {
+        setError(err.details.map((d) => `${d.field}: ${d.message}`).join(" | "));
+      } else {
+        setError(err.message || "Login failed.");
+      }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -32,7 +47,10 @@ export default function Login() {
       <h1>Login</h1>
 
       {error && (
-        <div style={{ border: "1px solid #b33", padding: "12px", marginBottom: "12px" }}>
+        <div
+          role="alert"
+          style={{ border: "1px solid #b33", padding: "12px", marginBottom: "12px" }}
+        >
           {error}
         </div>
       )}
@@ -40,7 +58,11 @@ export default function Login() {
       <form onSubmit={onSubmit}>
         <label>
           Email
-          <input value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+          />
         </label>
 
         <label style={{ display: "block", marginTop: 12 }}>
@@ -49,11 +71,12 @@ export default function Login() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
           />
         </label>
 
-        <button style={{ marginTop: 16 }} type="submit">
-          Login
+        <button style={{ marginTop: 16 }} type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
     </div>

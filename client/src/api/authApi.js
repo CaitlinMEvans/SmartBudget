@@ -1,10 +1,10 @@
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
 
-async function request(path, body) {
+export async function request(path, body, method) {
   const res = await fetch(`${API_BASE}${path}`, {
-    method: "POST",
+    method: method,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: body ? JSON.stringify(body) : null,
   });
 
   const data = await res.json().catch(() => ({}));
@@ -19,5 +19,5 @@ async function request(path, body) {
   return data;
 }
 
-export const registerUser = (payload) => request("/auth/register", payload);
-export const loginUser = (payload) => request("/auth/login", payload);
+export const registerUser = (payload) => request("/auth/register", payload, "POST");
+export const loginUser = (payload) => request("/auth/login", payload, "POST");

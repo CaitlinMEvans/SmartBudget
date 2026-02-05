@@ -4,8 +4,8 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import RequireAuth from "./auth/RequireAuth";
-import Expenses from "./pages/Expenses";
-import Categories from "./pages/Categories";
+import Expenses from "./pages/Expense";
+import Categories from "./pages/Category";
 
 function App() {
   return (

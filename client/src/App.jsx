@@ -4,6 +4,8 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import RequireAuth from "./auth/RequireAuth";
+import Expenses from "./pages/Expenses";
+import Categories from "./pages/Categories";
 
 function App() {
   return (
@@ -20,6 +22,23 @@ function App() {
           element={
             <RequireAuth>
               <Home />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/expenses"
+          element={
+            <RequireAuth>
+              <Expenses />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/categories"
+          element={
+            <RequireAuth>
+              <Categories />
             </RequireAuth>
           }
         />

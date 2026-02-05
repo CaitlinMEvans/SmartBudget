@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import RequireAuth from "./auth/RequireAuth";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        
 
         {/* Example protected route */}
         <Route
@@ -23,7 +25,16 @@ function App() {
             </RequireAuth>
           }
         />
+        <Route
+          path="/profile"
+          element={
+            <RequireAuth>
+              <Profile />
+            </RequireAuth>
+          }
+        />
       </Routes>
+      
     </>
   );
 }

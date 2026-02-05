@@ -64,3 +64,64 @@ export async function login(req, res) {
     return res.status(500).json({ message: "Login failed." });
   }
 }
+
+// GET /auth/me
+export async function me(req, res) {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ message: "Unauthorized." });
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, createdAt: true },
+    });
+
+    if (!user) return res.status(404).json({ message: "User not found." });
+
+    return res.json(user);
+  } catch (err) {
+    console.error("ME_ERROR", err);
+    return res.status(500).json({ message: "Failed to load account info." });
+  }
+}
+
+export async function updatePassword(req, res) {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ message: "Unauthorized." });
+
+    const { currentPassword, newPassword } = req.body || {};
+
+    if (!currentPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "currentPassword and newPassword are required." });
+    }
+
+    if (typeof newPassword !== "string" || newPassword.length < 8) {
+      return res.status(400).json({ message: "New password must be at least 8 characters." });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, passwordHash: true },
+    });
+
+    if (!user) return res.status(404).json({ message: "User not found." });
+
+    const ok = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!ok) return res.status(401).json({ message: "Current password is incorrect." });
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error("UPDATE_PASSWORD_ERROR", err);
+    return res.status(500).json({ message: "Password update failed." });
+  }
+}

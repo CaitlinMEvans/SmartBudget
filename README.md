@@ -1,8 +1,12 @@
 # Quote
 "If today you are a little better than you were yesterday, then that is enough!" - David A. Bednar
 "Through determination and resilience, what once seemed impossible becomes inevitable."
-# SmartBudget  
+# SmartBudget
+
 **Student Expense Tracking and Financial Planner**
+
+> "If today you are a little better than you were yesterday, then that is enough!" - David A. Bednar  
+> "Through determination and resilience, what once seemed impossible becomes inevitable."
 
 SmartBudget is a web application designed to help students track expenses, manage budgets, and better understand their spending habits. The app focuses on simplicity, clarity, and real-world usefulness, allowing users to record daily expenses, organize them into categories, set weekly or monthly budgets, and view spending summaries through a clean dashboard.
 
@@ -10,9 +14,22 @@ This project is being developed as part of **CSE 499 – Senior Project** using 
 
 ---
 
+## Table of Contents
+
+- [Problem Statement](#problem-statement)
+- [Core Features](#core-features)
+- [Tech Stack](#tech-stack)
+- [Quick Start](#quick-start)
+- [Documentation](#documentation)
+- [Project Status](#project-status)
+- [Team](#team)
+- [License](#license)
+
+---
+
 ## Problem Statement
 
-Students often juggle tuition, rent, food, transportation, and personal expenses with limited income. Because expenses accumulate quietly, it’s easy to lose track of spending and overshoot budgets without realizing it.
+Students often juggle tuition, rent, food, transportation, and personal expenses with limited income. Because expenses accumulate quietly, it's easy to lose track of spending and overshoot budgets without realizing it.
 
 Most existing financial tools are either too complex or not tailored for student needs. SmartBudget aims to provide a **simple, student-friendly solution** that helps users stay aware of where their money is going and make more informed financial decisions.
 
@@ -20,16 +37,15 @@ Most existing financial tools are either too complex or not tailored for student
 
 ## Core Features
 
-- Secure user authentication (register, login, logout)
-- Add, edit, and delete expenses
-- Categorize expenses (e.g., food, rent, transport)
-- Set weekly or monthly budgets
-- Dashboard summary showing spending vs. budget
-- Filter expenses by category and date
+- ✅ Secure user authentication (register, login, logout)
+- ✅ JWT-based session management
+- ✅ Add, edit, and delete expenses
+- ✅ Categorize expenses (e.g., food, rent, transport)
+- ✅ Set weekly or monthly budgets
+- ✅ Dashboard summary showing spending vs. budget
+- ✅ Filter expenses by category and date
 
----
-
-## Planned Enhancements
+### Planned Enhancements
 
 - Visual charts (spending by category)
 - Export expense history (CSV)
@@ -41,214 +57,226 @@ Most existing financial tools are either too complex or not tailored for student
 
 ---
 
-## Project Architecture
+## Tech Stack
 
-SmartBudget follows a **client–server web architecture**:
+### Frontend
+- **Framework**: React 18 with Vite
+- **Styling**: CSS Modules / Tailwind CSS (TBD)
+- **State Management**: React Context API
+- **HTTP Client**: Axios
+- **Routing**: React Router v6
 
-- **Frontend:** React (Vite)
-- **Backend:** Node.js with Express (REST API)
-- **Database:** PostgreSQL or MongoDB (TBD by team)
-- **Authentication:** JWT-based authentication
-- **Deployment:**
-  - Frontend: Vercel or Netlify
-  - Backend: Render
-- **Version Control:** GitHub
-- **Project Management:** Trello + Agile sprints
+### Backend
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Authentication**: JWT (JSON Web Tokens)
+- **Password Hashing**: bcrypt
 
----
+### Database
+- **Database**: PostgreSQL
+- **ORM**: Prisma
+- **Hosting**: Local development / Production TBD
 
-## Repository Structure
-
-```text
-smartbudget/
-├── client/        # React frontend (Vite)
-├── server/        # Express backend (to be implemented)
-├── README.md
-└── .gitignore
-# Postgres + Prisma DB Setup and Usage
-
-## Prerequisites
-
-- Install PostgreSQL locally (includes `psql` + service)
-- Install pgAdmin (optional but recommended)
-- Node.js installed (project already uses it)
+### DevOps
+- **Version Control**: Git & GitHub
+- **Project Management**: Trello (Agile/Scrum)
+- **Package Manager**: npm
+- **Development**: Concurrent frontend/backend with concurrently
 
 ---
 
-## 1) Create the Local Postgres Role + Database (pgAdmin)
+## Quick Start
 
-### A) Create Role (User)
+### Prerequisites
 
-In pgAdmin:
+- Node.js (v18 or higher)
+- PostgreSQL (v14 or higher)
+- npm or yarn
+- Git
 
-1. Navigate to **Login/Group Roles** → **Create** → **Login/Group Role**
-2. **General** tab:
-   - Name: `smartbudget`
-3. **Definition** tab:
-   - Password: `smartbudget_pw`
-4. **Privileges** tab - Turn on:
-   - Can login
-   - Create databases (recommended)
-   - Create roles (optional)
-5. Click **Save**
+### Installation
 
-### B) Create Database
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/CaitlinMEvans/SmartBudget.git
+   cd SmartBudget
+   ```
 
-1. Navigate to **Databases** → **Create** → **Database**
-2. **General** tab:
-   - Name: `smartbudget`
-   - Owner: `smartbudget`
-3. Click **Save**
-
-Everything will live under the default schema: `public`.
-
----
-
-## 2) Server Environment Variables
-
-Create `server/.env` (or copy from `.env.example` if provided):
-```env
-PORT=8080
-JWT_SECRET=change_me_to_a_long_random_string
-JWT_EXPIRES_IN=1h
-
-DATABASE_URL="postgresql://smartbudget:smartbudget_pw@localhost:5432/smartbudget"
-```
-
----
-
-## 3) Install Dependencies + Initialize Prisma
-
-From `/server`:
-```bash
-npm install
-npx prisma generate
-```
-
----
-
-## 4) Run Migrations (Creates Tables in Postgres)
-
-From `/server`:
-```bash
-npx prisma migrate dev --name init
-```
-
-**What this does:**
-- Reads `prisma/schema.prisma`
-- Creates/updates tables in `smartbudget` DB (schema `public`)
-- Creates the Prisma migration history table
-
----
-
-## 5) Add a New Domain/Table (Prisma Model)
-
-### A) Add Model to Prisma Schema
-
-Open: `server/prisma/schema.prisma`
-
-Add your model under the others. Example:
-```prisma
-model Expense {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  amount      Decimal
-  category    String
-  createdAt   DateTime @default(now())
-
-  user        User     @relation(fields: [userId], references: [id])
-}
-```
-
-### B) Create/Apply Migration for Your Change
-
-From `/server`:
-```bash
-npx prisma migrate dev --name add_expense
-npx prisma generate
-```
-
-**Rules:**
-- Every schema change requires a new migration
-- Name migrations clearly: `add_expense`, `add_budget_tables`, `expense_indexes`, etc.
-
----
-
-## 6) Verify Everything is Working (Prisma + pgAdmin)
-
-### A) Prisma Studio (Quickest Sanity Check)
-
-From `/server`:
-```bash
-npx prisma studio
-```
-
-- Opens a browser UI (usually http://localhost:5555)
-- You should see your models listed (`User`, `Expense`, etc.)
-- You should be able to view records, add a record, etc.
-- If you register a user through the app and it's wired correctly, you'll see a new `User` row appear here.
-
-### B) pgAdmin Verification
-
-In pgAdmin:
-
-1. Navigate to **Servers** → your server → **Databases** → `smartbudget`
-2. **Schemas** → `public` → **Tables**
-
-Your tables should appear:
-- `"User"`
-- `"Expense"`
-- etc.
-
-**To check contents:**
-
-Right-click a table → **View/Edit Data** → **All Rows**
-
-Or run a query:
-```sql
-SELECT * FROM public."User" ORDER BY id ASC;
-SELECT * FROM public."Expense" ORDER BY id ASC;
-```
-
----
-
-## 7) Typical Workflow for Each Teammate
-
-1. Pull latest repo
-2. Create local Postgres role + DB (Section 1)
-3. Add `server/.env` (Section 2)
-4. Install dependencies:
-```bash
-   cd server
+2. **Install root dependencies**
+   ```bash
    npm install
-```
-5. Apply existing migrations:
-```bash
-   npx prisma migrate dev
-   npx prisma generate
-```
+   ```
 
-**When adding your own tables:**
-
-1. Edit `prisma/schema.prisma`
-2. Run:
-```bash
-   npx prisma migrate dev --name <your_change>
+3. **Set up the database**
+   
+   Follow the detailed guide: [ Database Setup Guide](docs/DATABASE_SETUP.md)
+   
+   Quick version:
+   ```bash
+   # Create database and user in PostgreSQL
+   # Then in server directory:
+   cd server
+   cp .env.example .env
+   # Edit .env with your database credentials
    npx prisma generate
-```
-3. Verify in:
-   - `npx prisma studio`
-   - pgAdmin tables + query tool
+   npx prisma migrate dev --name init
+   ```
+
+4. **Install client dependencies**
+   ```bash
+   cd client
+   npm install
+   ```
+
+5. **Install server dependencies**
+   ```bash
+   cd ../server
+   npm install
+   ```
+
+6. **Start development servers**
+   ```bash
+   # From root directory
+   npm run dev
+   ```
+   
+   This will start:
+   - Frontend: http://localhost:5173
+   - Backend: http://localhost:8080
 
 ---
 
-## Common Gotchas
+##  Documentation
 
-- **Wrong DB creds** → you'll see Prisma error `P1000` (auth failed). Re-check `.env` `DATABASE_URL`.
-- **DB not running** → `P1001` (can't reach server). Start Postgres service.
-- **Tables not showing in pgAdmin** → refresh the schema/tables node (right-click → **Refresh**).
-- **Quoting table names:** Prisma often creates `"User"` with capitalization. In SQL, use:
-```sql
-  SELECT * FROM public."User";
+### For Developers
+
+| Document | Description |
+|----------|-------------|
+| [ Authentication & Accounts](docs/AUTH_ACCOUNTS.md) | Complete guide to JWT authentication, user registration, login, and account management |
+| [ Database Setup](docs/DATABASE_SETUP.md) | PostgreSQL and Prisma setup, schema management, and migrations |
+| [ API Reference](docs/API_REFERENCE.md) | Complete REST API documentation with endpoints, requests, and responses |
+| [ Deployment Guide](docs/DEPLOYMENT.md) | Production deployment instructions (Coming Soon) |
+
+### Quick Links
+
+- **Getting Started**: You're reading it! Check the [Quick Start](#quick-start) section above
+- **Authentication**: See [Auth Documentation](docs/AUTH_ACCOUNTS.md) for login/register implementation
+- **Database**: See [Database Documentation](docs/DATABASE_SETUP.md) for schema and migrations
+- **API Endpoints**: See [API Reference](docs/API_REFERENCE.md) for all available endpoints
+
+---
+
+## Project Structure
+
 ```
-  not `public.user`.
+SmartBudget/
+├── client/                    # React frontend
+│   ├── src/
+│   │   ├── components/       # Reusable UI components
+│   │   ├── pages/            # Page components (Login, Dashboard, etc.)
+│   │   ├── context/          # React Context (Auth, etc.)
+│   │   ├── services/         # API services
+│   │   └── App.jsx           # Main app component
+│   ├── public/               # Static assets
+│   └── package.json
+│
+├── server/                    # Express backend
+│   ├── src/
+│   │   ├── controllers/      # Business logic
+│   │   ├── middleware/       # Express middleware (auth, etc.)
+│   │   ├── routes/           # API routes
+│   │   ├── db/               # Database connection
+│   │   └── index.js          # Server entry point
+│   ├── prisma/
+│   │   ├── schema.prisma     # Database schema
+│   │   └── migrations/       # Migration history
+│   ├── .env                  # Environment variables (not in Git)
+│   └── package.json
+│
+├── docs/                      # Documentation
+│   ├── AUTH_ACCOUNTS.md      # Authentication guide
+│   └──  DATABASE_SETUP.md     # Database setup guide
+<!-- │   ├── API_REFERENCE.md      # API documentation -->
+<!-- │   └── DEPLOYMENT.md         # Deployment guide -->
+│
+├── node_modules/             # Root dependencies
+├── package.json              # Root package (concurrently)
+└── README.md                 # This file
+```
+
+---
+
+## Authentication Quick Reference
+
+SmartBudget uses **JWT-based authentication** for secure user sessions.
+
+### How It Works
+
+1. User registers or logs in
+2. Server generates JWT token
+3. Frontend stores token in localStorage
+4. Protected routes require token in `Authorization: Bearer <token>` header
+
+### Available Auth Endpoints
+
+```bash
+POST /auth/register         # Create new account
+POST /auth/login            # Login to existing account
+GET  /auth/me               # Get current user (protected)
+PUT  /auth/password         # Update password (protected)
+```
+
+For complete authentication documentation, see [Auth & Accounts Guide](docs/AUTH_ACCOUNTS.md).
+
+---
+### Development Workflow
+
+1. Pull latest changes: `git pull origin main`
+2. Create feature branch: `git checkout -b feature/your-feature`
+3. Make changes and commit: `git commit -m "Add feature"`
+4. Push to GitHub: `git push origin feature/your-feature`
+5. Create Pull Request on GitHub
+
+---
+
+## Scripts
+
+```bash
+# Root directory
+npm run dev              # Start both client and server
+npm run dev:client       # Start only frontend
+npm run dev:server       # Start only backend
+
+# Client directory (cd client)
+npm run dev              # Start Vite dev server
+npm run build            # Build for production
+npm run preview          # Preview production build
+
+# Server directory (cd server)
+npm run dev              # Start Express with nodemon
+npm start                # Start Express (production)
+npx prisma studio        # Open database GUI
+npx prisma migrate dev   # Run new migration
+```
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+**Cannot connect to database**
+- Ensure PostgreSQL is running
+- Check DATABASE_URL in `server/.env`
+- See [Database Setup Guide](docs/DATABASE_SETUP.md)
+
+**JWT/Authentication errors**
+- Check JWT_SECRET in `server/.env`
+- Ensure token is being sent in Authorization header
+- See [Auth Documentation](docs/AUTH_ACCOUNTS.md)
+
+**Port already in use**
+- Backend (8080): Change PORT in `server/.env`
+- Frontend (5173): Vite will auto-increment port
+
+For more troubleshooting, see individual documentation files.

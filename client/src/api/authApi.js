@@ -45,5 +45,5 @@ export const getMe = () => request("/auth/me", null, "GET");
 // Optional exports if other areas want a generic request helper
 export { request };
 
-// Update Passowrd 
+// Update Password 
 export const updatePassword = (payload) => request("/auth/password", payload, "PUT");

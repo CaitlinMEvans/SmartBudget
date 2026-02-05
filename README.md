@@ -154,15 +154,12 @@ Most existing financial tools are either too complex or not tailored for student
 |----------|-------------|
 | [ Authentication & Accounts](docs/AUTH_ACCOUNTS.md) | Complete guide to JWT authentication, user registration, login, and account management |
 | [ Database Setup](docs/DATABASE_SETUP.md) | PostgreSQL and Prisma setup, schema management, and migrations |
-| [ API Reference](docs/API_REFERENCE.md) | Complete REST API documentation with endpoints, requests, and responses |
-| [ Deployment Guide](docs/DEPLOYMENT.md) | Production deployment instructions (Coming Soon) |
 
 ### Quick Links
 
 - **Getting Started**: You're reading it! Check the [Quick Start](#quick-start) section above
 - **Authentication**: See [Auth Documentation](docs/AUTH_ACCOUNTS.md) for login/register implementation
 - **Database**: See [Database Documentation](docs/DATABASE_SETUP.md) for schema and migrations
-- **API Endpoints**: See [API Reference](docs/API_REFERENCE.md) for all available endpoints
 
 ---
 
@@ -196,8 +193,6 @@ SmartBudget/
 ├── docs/                      # Documentation
 │   ├── AUTH_ACCOUNTS.md      # Authentication guide
 │   └──  DATABASE_SETUP.md     # Database setup guide
-<!-- │   ├── API_REFERENCE.md      # API documentation -->
-<!-- │   └── DEPLOYMENT.md         # Deployment guide -->
 │
 ├── node_modules/             # Root dependencies
 ├── package.json              # Root package (concurrently)

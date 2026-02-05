@@ -20,19 +20,16 @@ export default function TopNav() {
 
       <div style={styles.right}>
         {!isAuthed ? (
-          <>
-            <Link to="/register" style={styles.link}>
-              Register
-            </Link>
-            <Link to="/login" style={styles.link}>
-              Login
-            </Link>
-          </>
-        ) : (
-          <button type="button" onClick={handleLogout} style={styles.button}>
-            Logout
-          </button>
-        )}
+        <>
+          <Link to="/register" style={styles.link}>Register</Link>
+          <Link to="/login" style={styles.link}>Login</Link>
+        </>
+      ) : (
+        <>
+          <Link to="/profile" style={styles.link}>Profile</Link>
+          <button onClick={handleLogout} style={styles.button}>Logout</button>
+        </>
+      )}
       </div>
     </header>
   );

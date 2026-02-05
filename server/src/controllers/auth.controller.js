@@ -64,3 +64,23 @@ export async function login(req, res) {
     return res.status(500).json({ message: "Login failed." });
   }
 }
+
+// GET /auth/me
+export async function me(req, res) {
+  try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ message: "Unauthorized." });
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, createdAt: true },
+    });
+
+    if (!user) return res.status(404).json({ message: "User not found." });
+
+    return res.json(user);
+  } catch (err) {
+    console.error("ME_ERROR", err);
+    return res.status(500).json({ message: "Failed to load account info." });
+  }
+}

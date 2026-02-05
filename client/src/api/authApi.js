@@ -39,8 +39,11 @@ async function request(path, body = null, method = "POST") {
 export const registerUser = (payload) => request("/auth/register", payload, "POST");
 export const loginUser = (payload) => request("/auth/login", payload, "POST");
 
-// SP3: Account/Profile endpoint
+//  Account/Profile endpoint
 export const getMe = () => request("/auth/me", null, "GET");
 
 // Optional exports if other areas want a generic request helper
 export { request };
+
+// Update Passowrd 
+export const updatePassword = (payload) => request("/auth/password", payload, "PUT");

@@ -18,4 +18,7 @@ router.get("/me", requireAuth, (req, res) => {
 // Account/Profile endpoint
 router.get("/me", requireAuth, me);
 
+// Account Update Password 
+router.put("/password", requireAuth, updatePassword);
+
 export default router;

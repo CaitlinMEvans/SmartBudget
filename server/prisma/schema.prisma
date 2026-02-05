@@ -13,4 +13,32 @@ model User {
   passwordHash String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  expenses     Expense[]
+}
+
+model Category {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+
+  // Optional relation to Expense if you want to link expenses to categories
+  expenses Expense[] 
+
+  @@map("categories") // maps to your existing table name
+}
+
+
+model Expense {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  categoryId  Int
+  amount      Decimal
+  note        String?
+  expenseDate DateTime  @map("expense_date")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  user        User      @relation(fields: [userId], references: [id])
+  category    Category  @relation(fields: [categoryId], references: [id])
+
+  @@map("expenses")
 }

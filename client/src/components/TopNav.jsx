@@ -16,6 +16,17 @@ export default function TopNav() {
         <Link to="/" style={styles.brand}>
           SmartBudget
         </Link>
+
+        {isAuthed && (
+          <>
+            <Link to="/expenses" style={styles.link}>
+              Expenses
+            </Link>
+            <Link to="/categories" style={styles.link}>
+              Categories
+            </Link>
+          </>
+        )}
       </div>
 
       <div style={styles.right}>

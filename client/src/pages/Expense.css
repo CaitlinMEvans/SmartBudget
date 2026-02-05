@@ -1,0 +1,72 @@
+.expenses-page {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.primary-btn {
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.alert {
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+
+.alert.success {
+  background: #e6fffa;
+  color: #065f46;
+}
+
+.alert.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.expense-form {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.expense-form input,
+.expense-form select,
+.expense-form button {
+  padding: 8px;
+}
+
+.expenses-list {
+  list-style: none;
+  padding: 0;
+}
+
+.expense-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.meta {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.actions button {
+  margin-left: 8px;
+  padding: 5px 10px;
+}
+
+.actions .danger {
+  background: #dc2626;
+  color: white;
+  border: none;
+}

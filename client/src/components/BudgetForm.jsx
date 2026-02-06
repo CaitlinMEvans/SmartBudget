@@ -14,9 +14,9 @@ export default function BudgetForm() {
       try {
         const res = await request("/budget", null, "GET");
 
-        if (!res.data) return;
+        if (!res?.data) return;
 
-        const data = await res.data;
+        const data = res.data;
 
         setBudgetId(data.budgetId);
         setAmount(data.amount);

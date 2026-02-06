@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import RequireAuth from "./auth/RequireAuth";
+import Budget from "./pages/Budget";
 import Profile from "./pages/Profile";
 
 function App() {
@@ -14,9 +15,12 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        
+        <Route path="/budget" element={
+            <RequireAuth>
+              <Budget />
+            </RequireAuth>} />
 
-        {/* Example protected route */}
+          {/* Example protected route */}
         <Route
           path="/dashboard"
           element={

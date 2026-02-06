@@ -30,12 +30,9 @@ export default function TopNav() {
           </>
         ) : (
           <>
-            <Link to="/budget" style={styles.link}>
-              Budgets
-            </Link>
-            <button type="button" onClick={handleLogout} style={styles.button}>
-              Logout
-            </button>
+            <Link to="/budget" style={styles.link}>Budgets</Link>
+            <Link to="/profile" style={styles.link}>Profile</Link>
+            <button onClick={handleLogout} style={styles.button}>Logout</button>
           </>
         )}
       </div>

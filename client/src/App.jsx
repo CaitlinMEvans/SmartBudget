@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import RequireAuth from "./auth/RequireAuth";
 import Budget from "./pages/Budget";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -28,7 +29,16 @@ function App() {
             </RequireAuth>
           }
         />
+        <Route
+          path="/profile"
+          element={
+            <RequireAuth>
+              <Profile />
+            </RequireAuth>
+          }
+        />
       </Routes>
+      
     </>
   );
 }

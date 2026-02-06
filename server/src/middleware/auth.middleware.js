@@ -1,24 +1,29 @@
+// server/src/middleware/auth.middleware.js
 import jwt from "jsonwebtoken";
 
 export function requireAuth(req, res, next) {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Missing or invalid token" });
-  }
-
-  const token = authHeader.split(" ")[1];
-
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const authHeader = req.headers.authorization || "";
+    const [scheme, token] = authHeader.split(" ");
 
-    // Attach user info to request for downstream use
+    if (scheme !== "Bearer" || !token) {
+      return res.status(401).json({ message: "Missing or invalid Authorization header." });
+    }
+
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      return res.status(500).json({ message: "Server misconfigured: JWT_SECRET missing." });
+    }
+
+    const payload = jwt.verify(token, secret);
+
+    // We sign tokens with { sub: userId }
     req.user = {
-      userId: payload.userId,
+      userId: Number(payload.sub), // payload.sub is string/int depending on sign
     };
 
-    next();
+    return next();
   } catch (err) {
-    return res.status(401).json({ error: "Invalid or expired token" });
+    return res.status(401).json({ message: "Invalid or expired token." });
   }
 }

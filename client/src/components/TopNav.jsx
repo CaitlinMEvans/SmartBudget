@@ -29,9 +29,14 @@ export default function TopNav() {
             </Link>
           </>
         ) : (
-          <button type="button" onClick={handleLogout} style={styles.button}>
-            Logout
-          </button>
+          <>
+            <Link to="/budget" style={styles.link}>
+              Budgets
+            </Link>
+            <button type="button" onClick={handleLogout} style={styles.button}>
+              Logout
+            </button>
+          </>
         )}
       </div>
     </header>

@@ -13,4 +13,21 @@ model User {
   passwordHash String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  budgets      Budget[]
+}
+
+// Budget model
+model Budget {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  category  String
+  limit     Decimal  @db.Decimal(10, 2)
+  period    String // 'weekly' or 'monthly'
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import RequireAuth from "./auth/RequireAuth";
 import Budget from "./pages/Budget";
 import Profile from "./pages/Profile";
+import AddBudget from "./pages/AddBudget";
 
 function App() {
   return (
@@ -19,7 +20,12 @@ function App() {
             <RequireAuth>
               <Budget />
             </RequireAuth>} />
-
+        <Route path="/budget/add" element={
+            <RequireAuth>
+              <AddBudget />
+            </RequireAuth>
+          } />
+        
           {/* Example protected route */}
         <Route
           path="/dashboard"

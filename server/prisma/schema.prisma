@@ -22,6 +22,7 @@ model Budget {
   userId    Int
   category  String
   limit     Decimal  @db.Decimal(10, 2)
+  spent     Decimal  @db.Decimal(10, 2) @default(0)
   period    String // 'weekly' or 'monthly'
   startDate DateTime
   endDate   DateTime

@@ -1,0 +1,16 @@
+/* Dashboard Container */
+.dashboard-container {
+  width: 100%;
+  max-width: 800px;
+  padding: 0 1rem;
+  font-family: Arial, sans-serif;
+}
+
+/* Horizontal pair container */
+.dashboard-pair {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}

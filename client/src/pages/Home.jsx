@@ -1,16 +1,37 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
-import Dashboard from "../components/Dashboard";
+import BudgetContainer from "../components/BudgetContainer.jsx";
+import { request } from "../api/authApi.js";
 
 export default function Home() {
   const { isAuthed } = useAuth();
+  const [budgets, setBudgets] = useState(null);
+
+  useEffect(() => {
+    if (!isAuthed) return;
+
+    let isMounted = true;
+
+    request("/dashboard", null, "GET").then(data => {
+      if (isMounted) {
+        setBudgets(data.budgets);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAuthed]);
 
   return (
     <div style={{ padding: 16 }}>
       <h1>SmartBudget</h1>
+
       {isAuthed ? (
-        <>
-          <Dashboard></Dashboard>
-        </>
+        <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+          <h2>Active Budgets</h2>
+          <BudgetContainer budgets={budgets} />
+        </div>
       ) : (
         <p>Please register or log in to continue.</p>
       )}

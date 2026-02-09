@@ -1,4 +1,5 @@
 import { useAuth } from "../auth/AuthContext";
+import Dashboard from "../components/Dashboard";
 
 export default function Home() {
   const { isAuthed } = useAuth();
@@ -7,7 +8,9 @@ export default function Home() {
     <div style={{ padding: 16 }}>
       <h1>SmartBudget</h1>
       {isAuthed ? (
-        <p>You are logged in. (Dashboard will go here.)</p>
+        <>
+          <Dashboard></Dashboard>
+        </>
       ) : (
         <p>Please register or log in to continue.</p>
       )}

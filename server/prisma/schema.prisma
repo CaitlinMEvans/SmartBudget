@@ -7,41 +7,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// User model
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  passwordHash String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
 
-  expenses     Expense[]
+  expenses Expense[]
+  budgets  Budget[] // Make sure this line exists
+
+  @@map("users")
 }
 
 model Category {
-  id    Int     @id @default(autoincrement())
-  name  String  @unique
+  id   Int    @id @default(autoincrement())
+  name String @unique
 
   // Optional relation to Expense if you want to link expenses to categories
-  expenses Expense[] 
+  expenses Expense[]
 
   @@map("categories") // maps to your existing table name
 }
 
-
+// Expense model
 model Expense {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   userId      Int
   categoryId  Int
+  budgetId    Int? // Add this line if it's not there (optional budget reference)
   amount      Decimal
   note        String?
-  expenseDate DateTime  @map("expense_date")
-  createdAt   DateTime  @default(now()) @map("created_at")
+  expenseDate DateTime @map("expense_date")
+  createdAt   DateTime @default(now()) @map("created_at")
 
-  user        User      @relation(fields: [userId], references: [id])
-  category    Category  @relation(fields: [categoryId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+  budget   Budget?  @relation(fields: [budgetId], references: [id]) // Add this if linking to budget
 
   @@map("expenses")
-  budgets      Budget[]
 }
 
 // Budget model
@@ -50,13 +55,14 @@ model Budget {
   userId    Int
   category  String
   limit     Decimal  @db.Decimal(10, 2)
-  spent     Decimal  @db.Decimal(10, 2) @default(0)
+  spent     Decimal  @default(0) @db.Decimal(10, 2)
   period    String // 'weekly' or 'monthly'
   startDate DateTime
   endDate   DateTime
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expenses Expense[] // Add this line - reverse relation to Expense
 
-  @@index([userId])
+  @@map("budgets")
 }

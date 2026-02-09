@@ -3,10 +3,13 @@ import { request } from "../api/authApi";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./BudgetForm.css";
+import { useNavigate } from "react-router-dom";
 
 export default function BudgetForm() {
+  const navigate = useNavigate();
+
   const [category, setCategory] = useState("");
-  const [limit, setLimit] = useState(0);
+  const [limit, setLimit] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [period, setPeriod] = useState("weekly");
   const [loading, setLoading] = useState(false);
@@ -16,47 +19,44 @@ export default function BudgetForm() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
+    setSuccess(false);
 
-    // Check various error conditions
-    if (limit <= 0) {
-      setError("Limit cannot be less than or equal to 0");
+    const numericLimit = Number(limit);
+
+    if (!category.trim()) {
+      setError("Category is required.");
       return;
     }
 
-    if (category === "") {
-      setError("The category must have a value.")
+    if (!Number.isFinite(numericLimit) || numericLimit <= 0) {
+      setError("Limit must be a number greater than 0.");
       return;
     }
 
     setLoading(true);
-    setSuccess(false);
 
     try {
-      // Use the request method that Caitlin built
-      const data = await request("/budget", {
-        category,
-        limit,
-        period,
-        startDate: startDate.toISOString()
-      }, "POST");
-
-      if (!data) {
-        setError("Failed to save budget");
-        return;
-      }
+      const data = await request(
+        "/budget",
+        {
+          category: category.trim(),
+          limit: numericLimit,
+          period,
+          startDate: startDate.toISOString(),
+        },
+        "POST"
+      );
 
       setSuccess(true);
-      if (data.budgetId) setBudgetId(data.budgetId);
+
+      // Optional: route back to budgets after save
+      setTimeout(() => navigate("/budget"), 400);
+      return data;
     } catch (err) {
-      setError("Failed to save budget");
+      setError(err?.message || "Failed to save budget");
     } finally {
       setLoading(false);
     }
-  }
-
-  function setDate(date) {
-    const newDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    setStartDate(newDate);
   }
 
   return (
@@ -86,7 +86,7 @@ export default function BudgetForm() {
 
       <label>
         Start date:
-        <DatePicker selected={startDate} onChange={(date) => setDate(date)} />
+        <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} />
       </label>
 
       <fieldset>
@@ -113,12 +113,10 @@ export default function BudgetForm() {
         </label>
       </fieldset>
 
-      <button disabled={loading}>
-        {loading ? "Saving..." : "Save Budget"}
-      </button>
+      <button disabled={loading}>{loading ? "Saving..." : "Save Budget"}</button>
 
-      {success && <p style={{ color: "green" }}>Budget saved successfully!</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {success && <p>Budget saved successfully!</p>}
+      {error && <p>{error}</p>}
     </form>
   );
 }

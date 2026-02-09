@@ -1,175 +1,214 @@
-// server/src/controllers/auth.controller.js
-import { prisma } from "../db/prisma.js"
+// server/src/controllers/budget.controller.js
+import { prisma } from "../db/prisma.js";
 
+/**
+ * GET /budget
+ * Return all budgets for the authenticated user
+ */
 export async function getBudgets(req, res) {
   try {
     const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: "Unauthorized." });
 
-    // database query to retrieve data based on id
-    const budgets = await prisma.budget.findMany({ where: { userId } })
-
-    // check if query returned anything - if not, update status to an error code
-    if (!budgets)
-      return res.status(603).json({ error: "A budget does not exist for that user." });
+    const budgets = await prisma.budget.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    });
 
     return res.status(200).json({ budgets });
   } catch (err) {
-    console.error("getBugdets error:", err);
+    console.error("getBudgets error:", err);
     return res.status(500).json({ error: "Server error." });
   }
 }
 
+/**
+ * GET /budget/:id
+ * Return one budget by id for the authenticated user
+ */
 export async function getBudgetById(req, res) {
   try {
-    const budgetId = Number(req.params.id);
     const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: "Unauthorized." });
 
-    // database query to retrieve data based on id
-    const budget = await prisma.budget.findFirst({ where: { userId: userId, id: budgetId } })
+    const budgetId = Number(req.params.id);
+    if (!Number.isFinite(budgetId)) {
+      return res.status(400).json({ error: "Invalid budget id." });
+    }
 
-    // check if query returned anything - if not, update status to an error code
-    if (!budget)
-      return res.status(602).json({ error: "A budget does not exist with that Id." });
+    const budget = await prisma.budget.findFirst({
+      where: { id: budgetId, userId },
+    });
+
+    if (!budget) {
+      return res.status(404).json({ error: "Budget not found." });
+    }
 
     return res.status(200).json({ budget });
   } catch (err) {
-    console.error("getBugdetById error:", err);
+    console.error("getBudgetById error:", err);
     return res.status(500).json({ error: "Server error." });
   }
 }
 
+/**
+ * POST /budget
+ * Create a budget for the authenticated user
+ * Allows multiple budgets for the same date window (no duplicates restriction)
+ */
 export async function postBudget(req, res) {
   try {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: "Unauthorized." });
+
     let { category, limit, period, startDate } = req.body || {};
 
-    // Make the period lowercase
-    period = period.toLowerCase();
-
-    // Make the startDate a date object
-    startDate = new Date(startDate);
-
-    // Make a copy of the start date since Dates are mutable
-    let endDate = new Date(startDate);
-
-    // Add 7 days to the start date to get the endDate of the weekly budget
-    if (period === "weekly")
-      endDate.setDate(endDate.getDate() + 7);
-
-    // Add 30 days to the start date to get the endDate of the monthly budget
-    else if (period === "monthly")
-      endDate.setMonth(startDate.getMonth() + 1);
-
-    // The period isn't weekly or monthly, so return an error status
-    else
-      return res.status(604).json({ error: "Budget period must be either 'weekly' or 'monthly'" });
-
-    // Update the dates to an ISO string
-    startDate = startDate.toISOString();
-    endDate = endDate.toISOString();
-
-    if (category === undefined || limit === undefined || period === undefined || startDate === undefined)
-      return res.status(601).json({ error: "Cannot create new budget. One or more required fields are missing." });
-
-    limit = Number(limit);
-
-    if (limit <= 0) {
-      return res.status(606).json({ error: "Limit cannot be less than or equal to 0." });
+    if (!category || limit === undefined || !period || !startDate) {
+      return res.status(400).json({ error: "Missing required fields." });
     }
 
-    const userId = req.user?.userId;
+    category = String(category).trim();
+    period = String(period).toLowerCase().trim();
 
-    // Check to see if a budget already exists with the given period
-    const existingBudget = await prisma.budget.findFirst({ where: { period: period, startDate: { lte: startDate }, endDate: { gte: startDate } } })
+    const numericLimit = Number(limit);
+    if (!Number.isFinite(numericLimit) || numericLimit <= 0) {
+      return res.status(400).json({ error: "Limit must be > 0." });
+    }
 
-    // If a budget already exists, return an error
-    if (existingBudget)
-      return res.status(600).json({ error: "A budget with the given period already exists" });
+    const start = new Date(startDate);
+    if (Number.isNaN(start.getTime())) {
+      return res.status(400).json({ error: "Invalid startDate." });
+    }
 
-    // database query to create the budget
+    const end = new Date(start);
+    if (period === "weekly") {
+      end.setDate(end.getDate() + 7);
+    } else if (period === "monthly") {
+      end.setMonth(end.getMonth() + 1);
+    } else {
+      return res.status(400).json({ error: "Period must be 'weekly' or 'monthly'." });
+    }
+
     const newBudget = await prisma.budget.create({
       data: {
+        userId,
         category,
-        limit,
+        limit: numericLimit,
         period,
-        startDate,
-        endDate,
-        user: {
-          connect: { id: userId }
-        }
-      }
-    })
+        startDate: start,
+        endDate: end,
+        // spent defaults to 0 via Prisma schema
+      },
+    });
 
-    // check if error comes back from postgres
-    if (!newBudget)
-      throw Error("Unable to create a new budget");
-
-    return res.status(200).json({ message: "Budget successfully added", budget: newBudget });
+    return res.status(201).json({
+      message: "Budget created",
+      budget: newBudget,
+    });
   } catch (err) {
-    console.log("Error in postBudget", err);
-    return res.status(500).json({ error: "Server error" });
+    console.error("postBudget error:", err);
+    return res.status(500).json({ error: "Server error." });
   }
-
 }
 
+/**
+ * PUT /budget/:id
+ * Update a budget by id for the authenticated user
+ */
 export async function putBudget(req, res) {
   try {
-    let { budgetId, category, limit, period, startDate } = req.body || {};
-
-    // Make the startDate a date object
-    startDate = new Date(startDate);
-
-    // Make a copy of the start date since Dates are mutable
-    let endDate = new Date(startDate);
-
-    // Make the period lowercase
-    period = period.toLowerCase();
-
-    // Add 7 days to the start date to get the endDate of the weekly budget
-    if (period === "weekly")
-      endDate.setDate(endDate.getDate() + 7);
-
-    // Add 30 days to the start date to get the endDate of the monthly budget
-    else if (period === "monthly")
-      endDate.setMonth(startDate.getMonth() + 1);
-
-    // The period isn't weekly or monthly, so return an error status
-    else
-      return res.status(604).json({ error: "Budget period must be either 'weekly' or 'monthly'" });
-
-    // Update the dates to an ISO string
-    startDate = startDate.toISOString();
-    endDate = endDate.toISOString();
-
-    if (category === undefined || limit === undefined || period === undefined || startDate === undefined)
-      return res.status(601).json({ error: "Cannot update budget. One or more required fields are missing." });
-
     const userId = req.user?.userId;
+    if (!userId) return res.status(401).json({ error: "Unauthorized." });
 
-    // Check to see if the budgetId exists
-    const existingBudget = await prisma.budget.findFirst({ where: { id: budgetId } })
+    const budgetId = Number(req.params.id);
+    if (!Number.isFinite(budgetId)) {
+      return res.status(400).json({ error: "Invalid budget id." });
+    }
 
-    // If a budget doesn't exist, return an error
-    if (!existingBudget)
-      return res.status(605).json({ message: "Could not find budget with specified Id" });
+    let { category, limit, period, startDate, spent } = req.body || {};
 
-    // Update the budget
-    const updatedBudget = await prisma.budget.update({
-      where: { id: budgetId },
-      data: {
-        category,
-        limit,
-        period,
-        startDate,
-        endDate,
-        user: {
-          connect: { id: userId }
-        }
-      },
-    })
+    // Optional fields: allow partial updates, but validate anything provided
+    const data = {};
 
-    return res.status(200).json({ message: "Budget successfully updated", updatedBudget });
+    if (category !== undefined) {
+      const c = String(category).trim();
+      if (!c) return res.status(400).json({ error: "Category cannot be empty." });
+      data.category = c;
+    }
+
+    if (limit !== undefined) {
+      const numericLimit = Number(limit);
+      if (!Number.isFinite(numericLimit) || numericLimit <= 0) {
+        return res.status(400).json({ error: "Limit must be > 0." });
+      }
+      data.limit = numericLimit;
+    }
+
+    if (spent !== undefined) {
+      const numericSpent = Number(spent);
+      if (!Number.isFinite(numericSpent) || numericSpent < 0) {
+        return res.status(400).json({ error: "Spent must be >= 0." });
+      }
+      data.spent = numericSpent;
+    }
+
+    // If period or startDate changes, recompute endDate too
+    let nextPeriod = period !== undefined ? String(period).toLowerCase().trim() : undefined;
+    let nextStart = startDate !== undefined ? new Date(startDate) : undefined;
+
+    if (startDate !== undefined && Number.isNaN(nextStart.getTime())) {
+      return res.status(400).json({ error: "Invalid startDate." });
+    }
+
+    if (nextPeriod !== undefined) {
+      if (nextPeriod !== "weekly" && nextPeriod !== "monthly") {
+        return res.status(400).json({ error: "Period must be 'weekly' or 'monthly'." });
+      }
+      data.period = nextPeriod;
+    }
+
+    if (nextStart !== undefined) {
+      data.startDate = nextStart;
+    }
+
+    // Recompute endDate if period or startDate provided
+    if (nextPeriod !== undefined || nextStart !== undefined) {
+      // Need current values if one is missing
+      const existing = await prisma.budget.findFirst({
+        where: { id: budgetId, userId },
+      });
+      if (!existing) return res.status(404).json({ error: "Budget not found." });
+
+      const actualPeriod = nextPeriod ?? existing.period;
+      const actualStart = nextStart ?? existing.startDate;
+
+      const end = new Date(actualStart);
+      if (actualPeriod === "weekly") end.setDate(end.getDate() + 7);
+      else end.setMonth(end.getMonth() + 1);
+
+      data.endDate = end;
+    }
+
+    // Enforce user ownership in update
+    const updatedBudget = await prisma.budget.updateMany({
+      where: { id: budgetId, userId },
+      data,
+    });
+
+    if (updatedBudget.count === 0) {
+      return res.status(404).json({ error: "Budget not found." });
+    }
+
+    const refreshed = await prisma.budget.findFirst({
+      where: { id: budgetId, userId },
+    });
+
+    return res.status(200).json({
+      message: "Budget updated",
+      budget: refreshed,
+    });
   } catch (err) {
-    console.log("Error in putBudget", err);
-    return res.status(500).json({ error: "Server error" });
+    console.error("putBudget error:", err);
+    return res.status(500).json({ error: "Server error." });
   }
 }

@@ -9,10 +9,10 @@ export async function getBudgets(req, res) {
     const budgets = await prisma.budget.findMany({ where: { userId } })
 
     // check if query returned anything - if not, update status to an error code
-    if (!budget)
+    if (!budgets)
       return res.status(603).json({ error: "A budget does not exist for that user." });
 
-    return res.status(200).json({ data: { budgets } });
+    return res.status(200).json({ budgets });
   } catch (err) {
     console.error("getBugdets error:", err);
     return res.status(500).json({ error: "Server error." });
@@ -31,7 +31,7 @@ export async function getBudgetById(req, res) {
     if (!budget)
       return res.status(602).json({ error: "A budget does not exist with that Id." });
 
-    return res.status(200).json({ data: { budget } });
+    return res.status(200).json({ budget });
   } catch (err) {
     console.error("getBugdetById error:", err);
     return res.status(500).json({ error: "Server error." });
@@ -42,6 +42,9 @@ export async function postBudget(req, res) {
   try {
     let { category, limit, period, startDate } = req.body || {};
 
+    // Make the period lowercase
+    period = period.toLowerCase();
+
     // Make the startDate a date object
     startDate = new Date(startDate);
 
@@ -49,11 +52,11 @@ export async function postBudget(req, res) {
     let endDate = new Date(startDate);
 
     // Add 7 days to the start date to get the endDate of the weekly budget
-    if (period.toLowerCase() === "weekly")
+    if (period === "weekly")
       endDate.setDate(endDate.getDate() + 7);
 
     // Add 30 days to the start date to get the endDate of the monthly budget
-    else if (period.toLowerCase() === "monthly")
+    else if (period === "monthly")
       endDate.setMonth(startDate.getMonth() + 1);
 
     // The period isn't weekly or monthly, so return an error status
@@ -67,17 +70,23 @@ export async function postBudget(req, res) {
     if (category === undefined || limit === undefined || period === undefined || startDate === undefined)
       return res.status(601).json({ error: "Cannot create new budget. One or more required fields are missing." });
 
+    limit = Number(limit);
+
+    if (limit <= 0) {
+      return res.status(606).json({ error: "Limit cannot be less than or equal to 0." });
+    }
+
     const userId = req.user?.userId;
 
     // Check to see if a budget already exists with the given period
-    const existingBudget = await prisma.budget.findFirst({ where: { period: period, endDate: { gte: startDate } } })
+    const existingBudget = await prisma.budget.findFirst({ where: { period: period, startDate: { lte: startDate }, endDate: { gte: startDate } } })
 
     // If a budget already exists, return an error
     if (existingBudget)
       return res.status(600).json({ error: "A budget with the given period already exists" });
 
     // database query to create the budget
-    const budgetUpdated = await prisma.budget.create({
+    const newBudget = await prisma.budget.create({
       data: {
         category,
         limit,
@@ -91,10 +100,10 @@ export async function postBudget(req, res) {
     })
 
     // check if error comes back from postgres
-    if (!budgetUpdated)
+    if (!newBudget)
       throw Error("Unable to create a new budget");
 
-    return res.status(200).json({ message: "Budget successfully added", budgetId: budgetUpdated });
+    return res.status(200).json({ message: "Budget successfully added", budget: newBudget });
   } catch (err) {
     console.log("Error in postBudget", err);
     return res.status(500).json({ error: "Server error" });
@@ -112,12 +121,15 @@ export async function putBudget(req, res) {
     // Make a copy of the start date since Dates are mutable
     let endDate = new Date(startDate);
 
+    // Make the period lowercase
+    period = period.toLowerCase();
+
     // Add 7 days to the start date to get the endDate of the weekly budget
-    if (period.toLowerCase() === "weekly")
+    if (period === "weekly")
       endDate.setDate(endDate.getDate() + 7);
 
     // Add 30 days to the start date to get the endDate of the monthly budget
-    else if (period.toLowerCase() === "monthly")
+    else if (period === "monthly")
       endDate.setMonth(startDate.getMonth() + 1);
 
     // The period isn't weekly or monthly, so return an error status
@@ -141,7 +153,8 @@ export async function putBudget(req, res) {
       return res.status(605).json({ message: "Could not find budget with specified Id" });
 
     // Update the budget
-    const updatedBudget = prisma.budget.update({
+    const updatedBudget = await prisma.budget.update({
+      where: { id: budgetId },
       data: {
         category,
         limit,
@@ -152,10 +165,9 @@ export async function putBudget(req, res) {
           connect: { id: userId }
         }
       },
-      where: { id: budgetId }
     })
 
-    return res.status(200).json({ message: "Budget successfully updated" });
+    return res.status(200).json({ message: "Budget successfully updated", updatedBudget });
   } catch (err) {
     console.log("Error in putBudget", err);
     return res.status(500).json({ error: "Server error" });

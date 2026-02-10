@@ -50,7 +50,20 @@ export default function TopNav() {
               >
                 Budgets
               </Link>
-              {/* Add more secondary pages here as needed */}
+              <Link
+                to="/categories"
+                style={styles.dropdownItem}
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                Categories
+              </Link>
+                            <Link
+                to="/expenses"
+                style={styles.dropdownItem}
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                Expenses
+              </Link>
             </div>
           )}
         </div>

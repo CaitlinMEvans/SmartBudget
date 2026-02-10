@@ -4,8 +4,6 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import RequireAuth from "./auth/RequireAuth";
-import Expenses from "./pages/Expense";
-import Categories from "./pages/Category";
 
 function App() {
   return (
@@ -15,8 +13,12 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/budget" element={
+            <RequireAuth>
+              <Budget />
+            </RequireAuth>} />
 
-        {/* Example protected route */}
+          {/* Example protected route */}
         <Route
           path="/dashboard"
           element={
@@ -25,24 +27,8 @@ function App() {
             </RequireAuth>
           }
         />
-        <Route
-          path="/expenses"
-          element={
-            <RequireAuth>
-              <Expenses />
-            </RequireAuth>
-          }
-        />
-
-        <Route
-          path="/categories"
-          element={
-            <RequireAuth>
-              <Categories />
-            </RequireAuth>
-          }
-        />
       </Routes>
+      
     </>
   );
 }

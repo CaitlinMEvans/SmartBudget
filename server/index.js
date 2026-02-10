@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import authRoutes from "./src/routes/auth.routes.js";
 import categoryRoutes from "./src/routes/category.routes.js";
 import expenseRoutes from "./src/routes/expense.routes.js";
-
+import budgetRoutes from "./src/routes/budget.routes.js";
 
 dotenv.config();
 
@@ -21,6 +21,7 @@ app.get("/", (req, res) => res.json({ ok: true }));
 app.use("/auth", authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/expenses', expenseRoutes);
+app.use("/budget", budgetRoutes);
 
 // ==========================
 // Error Handler (Optional but Recommended)
@@ -32,6 +33,7 @@ app.use((err, req, res, next) => {
     error: 'Something went wrong on the server'
   });
 });
+
 
 const port = process.env.PORT || 8080;
 app.listen(port, () => console.log(`Server running on port ${port}`));

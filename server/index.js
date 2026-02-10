@@ -14,9 +14,11 @@ const app = express();
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://smart-budget-one.vercel.app/', 
+    'https://smart-budget-one.vercel.app'  // Your actual Vercel URL
   ],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 

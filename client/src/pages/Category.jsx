@@ -139,17 +139,23 @@ const CategoriesPage = () => {
       ) : (
         <ul className="categories-list">
           {categories.map((cat) => (
-            <li key={cat.name}>
-              <span>
-                {cat.icon} {cat.name}
-              </span>
-              <span>
-                Spent: $
-                {(categorySpending[cat.name]?.total || 0).toFixed(2)} (
-                {categorySpending[cat.name]?.count || 0} expenses)
-              </span>
-              <button onClick={() => handleEdit(cat)}>Edit</button>
-              <button onClick={() => handleDelete(cat.name)}>Delete</button>
+            <li key={cat.name} className="category-card">
+              <div className="category-header">
+                <h3>
+                  {cat.icon} {cat.name}
+                </h3>
+              </div>
+              <div className="category-spending">
+                <span>
+                  Spent: $
+                  {(categorySpending[cat.name]?.total || 0).toFixed(2)} (
+                  {categorySpending[cat.name]?.count || 0} expenses)
+                </span>
+              </div>
+              <div className="category-actions">
+                <button onClick={() => handleEdit(cat)}>Edit</button>
+                <button onClick={() => handleDelete(cat.name)}>Delete</button>
+              </div>
             </li>
           ))}
         </ul>

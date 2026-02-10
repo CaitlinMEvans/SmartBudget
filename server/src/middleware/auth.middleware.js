@@ -17,9 +17,10 @@ export function requireAuth(req, res, next) {
 
     const payload = jwt.verify(token, secret);
 
-    // We sign tokens with { sub: userId }
+    // Change this to use 'id' instead of 'userId'
     req.user = {
-      userId: Number(payload.sub), // payload.sub is string/int depending on sign
+      id: Number(payload.sub),
+      userId: Number(payload.sub) // Keep both for backwards compatibility
     };
 
     return next();

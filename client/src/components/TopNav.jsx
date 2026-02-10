@@ -30,17 +30,6 @@ export default function TopNav() {
         <Link to="/" style={styles.brand}>
           SmartBudget
         </Link>
-
-        {isAuthed && (
-          <>
-            <Link to="/expenses" style={styles.link}>
-              Expenses
-            </Link>
-            <Link to="/categories" style={styles.link}>
-              Categories
-            </Link>
-          </>
-        )}
       </div>
 
       {/* Center dropdown - only shown when logged in */}
@@ -61,7 +50,20 @@ export default function TopNav() {
               >
                 Budgets
               </Link>
-              {/* Add more secondary pages here as needed */}
+              <Link
+                to="/categories"
+                style={styles.dropdownItem}
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                Categories
+              </Link>
+                            <Link
+                to="/expenses"
+                style={styles.dropdownItem}
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                Expenses
+              </Link>
             </div>
           )}
         </div>

@@ -1,38 +1,46 @@
 // src/services/expenseService.js
 import axios from 'axios';
 
-//const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
+// Helper to get auth headers
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  };
+};
 
 const expenseService = {
   // Get all expenses
   getAllExpenses: async () => {
-    const response = await axios.get(`${API_URL}/expenses`);
+    const response = await axios.get(`${API_URL}/expenses`, getAuthHeaders());
     return response.data.data; // array of expenses
   },
 
   // Get expense by ID
   getExpenseById: async (id) => {
-    const response = await axios.get(`${API_URL}/expenses/${id}`);
+    const response = await axios.get(`${API_URL}/expenses/${id}`, getAuthHeaders());
     return response.data.data;
   },
 
   // Create expense
   createExpense: async ({ category, amount, date, note }) => {
-    const response = await axios.post(`${API_URL}/expenses`, { category, amount, date, note });
+    const response = await axios.post(`${API_URL}/expenses`, { category, amount, date, note }, getAuthHeaders());
     return response.data.data;
   },
 
   // Update expense
   updateExpense: async (id, { category, amount, date, note }) => {
-    const response = await axios.put(`${API_URL}/expenses/${id}`, { category, amount, date, note });
+    const response = await axios.put(`${API_URL}/expenses/${id}`, { category, amount, date, note }, getAuthHeaders());
     return response.data.data;
   },
 
   // Delete expense
   deleteExpense: async (id) => {
-    const response = await axios.delete(`${API_URL}/expenses/${id}`);
+    const response = await axios.delete(`${API_URL}/expenses/${id}`, getAuthHeaders());
     return response.data.data;
   },
 

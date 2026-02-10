@@ -1,5 +1,5 @@
 import Expense from "../models/expense.model.js";
-import CategoryModel from "../models/category.model.js";
+import { prisma } from "../db/prisma.js";
 
 /**
  * GET /api/expenses
@@ -7,14 +7,25 @@ import CategoryModel from "../models/category.model.js";
  */
 export const getAllExpenses = async (req, res) => {
   try {
-    const userId = req.user?.id || 1; // fallback for testing
+    const userId = req.user?.id;
 
     const expenses = await Expense.getExpensesByUserId(userId);
 
+    // Format expenses to include category name for frontend
+    const formattedExpenses = expenses.map(exp => ({
+      id: exp.id,
+      userId: exp.userId,
+      category: exp.category?.name || 'Unknown',
+      amount: parseFloat(exp.amount),
+      date: exp.expenseDate,
+      note: exp.note,
+      createdAt: exp.createdAt
+    }));
+
     res.status(200).json({
       success: true,
-      count: expenses.length,
-      data: expenses
+      count: formattedExpenses.length,
+      data: formattedExpenses
     });
   } catch (error) {
     console.error("Get expenses error:", error);
@@ -31,9 +42,10 @@ export const getAllExpenses = async (req, res) => {
  */
 export const getExpenseById = async (req, res) => {
   try {
-    const expense = await Expense.getExpenseById(req.params.id);
+    const expenseId = parseInt(req.params.id);
+    const expense = await Expense.getExpenseById(expenseId);
 
-    if (!expense || expense.user_id !== req.user.id) {
+    if (!expense || expense.userId !== req.user.id) {
       return res.status(404).json({
         success: false,
         error: "Expense not found"
@@ -75,17 +87,43 @@ export const createExpense = async (req, res) => {
   }
 
   try {
+    // Look up category by name to get categoryId
+    const categoryRecord = await prisma.category.findUnique({
+      where: { name: category }
+    });
+
+    if (!categoryRecord) {
+      return res.status(400).json({
+        success: false,
+        error: `Category '${category}' not found`
+      });
+    }
+
     const expense = await Expense.createExpense({
       userId: req.user.id,
-      category,
-      amount,
+      categoryId: categoryRecord.id,
+      amount: parseFloat(amount),
       date: date || new Date(),
-      note
+      note: note || null
+    });
+
+    // Fetch the created expense with category info
+    const fullExpense = await prisma.expense.findUnique({
+      where: { id: expense.id },
+      include: { category: true }
     });
 
     res.status(201).json({
       success: true,
-      data: expense
+      data: {
+        id: fullExpense.id,
+        userId: fullExpense.userId,
+        category: fullExpense.category.name,
+        amount: parseFloat(fullExpense.amount),
+        date: fullExpense.expenseDate,
+        note: fullExpense.note,
+        createdAt: fullExpense.createdAt
+      }
     });
   } catch (error) {
     console.error("Create expense error:", error);
@@ -102,16 +140,40 @@ export const createExpense = async (req, res) => {
  */
 export const updateExpense = async (req, res) => {
   try {
-    const expense = await Expense.getExpenseById(req.params.id);
+    const expenseId = parseInt(req.params.id);
+    const expense = await Expense.getExpenseById(expenseId);
 
-    if (!expense || expense.user_id !== req.user.id) {
+    if (!expense || expense.userId !== req.user.id) {
       return res.status(404).json({
         success: false,
         error: "Expense not found"
       });
     }
 
-    const updated = await Expense.updateExpense(req.params.id, req.body);
+    const { category, amount, date, note } = req.body;
+    const updateData = {};
+
+    // If category name is provided, convert to categoryId
+    if (category) {
+      const categoryRecord = await prisma.category.findUnique({
+        where: { name: category }
+      });
+
+      if (!categoryRecord) {
+        return res.status(400).json({
+          success: false,
+          error: `Category '${category}' not found`
+        });
+      }
+
+      updateData.categoryId = categoryRecord.id;
+    }
+
+    if (amount !== undefined) updateData.amount = parseFloat(amount);
+    if (date !== undefined) updateData.expenseDate = new Date(date);
+    if (note !== undefined) updateData.note = note;
+
+    const updated = await Expense.updateExpense(expenseId, updateData);
 
     res.status(200).json({
       success: true,
@@ -132,16 +194,17 @@ export const updateExpense = async (req, res) => {
  */
 export const deleteExpense = async (req, res) => {
   try {
-    const expense = await Expense.getExpenseById(req.params.id);
+    const expenseId = parseInt(req.params.id);
+    const expense = await Expense.getExpenseById(expenseId);
 
-    if (!expense || expense.user_id !== req.user.id) {
+    if (!expense || expense.userId !== req.user.id) {
       return res.status(404).json({
         success: false,
         error: "Expense not found"
       });
     }
 
-    await Expense.deleteExpense(req.params.id);
+    await Expense.deleteExpense(expenseId);
 
     res.status(200).json({
       success: true,

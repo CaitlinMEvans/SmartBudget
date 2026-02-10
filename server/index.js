@@ -19,8 +19,8 @@ app.use(express.json());
 app.get("/", (req, res) => res.json({ ok: true }));
 
 app.use("/auth", authRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/expenses', expenseRoutes);
+app.use("/categories", categoryRoutes);
+app.use("/expenses", expenseRoutes);
 app.use("/budget", budgetRoutes);
 
 // ==========================

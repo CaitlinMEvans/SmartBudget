@@ -13,7 +13,6 @@ const CategoriesPage = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({ name: '' });
 
-  // Fetch categories and spending
   useEffect(() => {
     fetchAll();
   }, []);
@@ -38,30 +37,16 @@ const CategoriesPage = () => {
   const fetchCategorySpending = async () => {
     try {
       const stats = await expenseService.getExpenseStats();
-      const spendingMap = {};
+      const map = {};
 
       stats.byCategory.forEach(cat => {
-        // cat._id === category NAME
-        spendingMap[cat._id] = {
-          total: cat.total,
-          count: cat.count
-        };
+        map[cat._id] = { total: cat.total, count: cat.count };
       });
 
-      setCategorySpending(spendingMap);
+      setCategorySpending(map);
     } catch (err) {
-      console.error('Failed to fetch category spending:', err);
+      console.error(err);
     }
-  };
-
-  const handleInputChange = (e) => {
-    setFormData({ name: e.target.value });
-  };
-
-  const resetForm = () => {
-    setFormData({ name: '' });
-    setEditingCategory(null);
-    setShowForm(false);
   };
 
   const handleSubmit = async (e) => {
@@ -71,60 +56,62 @@ const CategoriesPage = () => {
 
     try {
       if (editingCategory) {
-        await categoryService.updateCategory(editingCategory.name, formData);
-        setSuccess('Category updated successfully');
+        await categoryService.updateCategory(editingCategory.id, formData);
+        setSuccess('Category updated');
       } else {
         await categoryService.createCategory(formData);
-        setSuccess('Category created successfully');
+        setSuccess('Category created');
       }
 
       await fetchAll();
       resetForm();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to save category');
     }
   };
 
-  const handleEdit = (category) => {
-    setEditingCategory(category);
-    setFormData({ name: category.name });
+  const resetForm = () => {
+    setFormData({ name: '' });
+    setEditingCategory(null);
+    setShowForm(false);
+  };
+
+  const handleEdit = (cat) => {
+    setEditingCategory(cat);
+    setFormData({ name: cat.name });
     setShowForm(true);
   };
 
-  const handleDelete = async (name) => {
+  const handleDelete = async (id) => {
     if (!window.confirm('Delete this category?')) return;
 
     try {
-      await categoryService.deleteCategory(name);
+      await categoryService.deleteCategory(id);
       setSuccess('Category deleted');
       await fetchAll();
-      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to delete category');
     }
   };
 
-  if (loading) return <p>Loading categories...</p>;
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div className="categories-page">
-      <h1>📂 Expense Categories</h1>
+      <h1>📂 Categories</h1>
 
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
       <button onClick={() => setShowForm(!showForm)}>
-        {showForm ? 'Cancel' : editingCategory ? 'Edit Category' : 'Add Category'}
+        {showForm ? 'Cancel' : 'Add Category'}
       </button>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="category-form">
+        <form onSubmit={handleSubmit}>
           <input
-            type="text"
-            name="name"
             value={formData.name}
-            onChange={handleInputChange}
+            onChange={e => setFormData({ name: e.target.value })}
             placeholder="Category name"
             required
           />
@@ -134,26 +121,18 @@ const CategoriesPage = () => {
         </form>
       )}
 
-      {categories.length === 0 ? (
-        <p>No categories yet.</p>
-      ) : (
-        <ul className="categories-list">
-          {categories.map((cat) => (
-            <li key={cat.name}>
-              <span>
-                {cat.icon} {cat.name}
-              </span>
-              <span>
-                Spent: $
-                {(categorySpending[cat.name]?.total || 0).toFixed(2)} (
-                {categorySpending[cat.name]?.count || 0} expenses)
-              </span>
-              <button onClick={() => handleEdit(cat)}>Edit</button>
-              <button onClick={() => handleDelete(cat.name)}>Delete</button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ul>
+        {categories.map(cat => (
+          <li key={cat.id}>
+            <strong>{cat.name}</strong>
+            <span>
+              ₦{(categorySpending[cat.name]?.total || 0).toFixed(2)}
+            </span>
+            <button onClick={() => handleEdit(cat)}>Edit</button>
+            <button onClick={() => handleDelete(cat.id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

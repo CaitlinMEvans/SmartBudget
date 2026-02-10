@@ -25,6 +25,15 @@ const ExpensesPage = () => {
     fetchData();
   }, []);
 
+  /* ---------------- helpers ---------------- */
+
+  const formatAmount = (value) => {
+    const num = Number(value);
+    return isNaN(num) ? '0.00' : num.toFixed(2);
+  };
+
+  /* ---------------- data fetching ---------------- */
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -34,21 +43,27 @@ const ExpensesPage = () => {
         categoryService.getAllCategories()
       ]);
 
-      setExpenses(expenseData);
+      setExpenses(Array.isArray(expenseData) ? expenseData : []);
       setCategories(categoryData.map(c => c.name));
       setError('');
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError('Failed to load data');
     } finally {
       setLoading(false);
     }
   };
 
+  /* ---------------- form handlers ---------------- */
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'amount' ? value.replace(/[^\d.]/g, '') : value
+      [name]: name === 'amount'
+        ? value.replace(/[^\d.]/g, '')
+        : value
     }));
   };
 
@@ -91,8 +106,8 @@ const ExpensesPage = () => {
     setEditingExpense(expense);
     setFormData({
       category: expense.category,
-      amount: expense.amount.toString(),
-      date: expense.date.split('T')[0],
+      amount: String(expense.amount),
+      date: expense.date?.split('T')[0] || '',
       note: expense.note || ''
     });
     setShowForm(true);
@@ -112,6 +127,8 @@ const ExpensesPage = () => {
   };
 
   if (loading) return <p>Loading expenses...</p>;
+
+  /* ---------------- UI ---------------- */
 
   return (
     <div className="expenses-page">
@@ -175,7 +192,7 @@ const ExpensesPage = () => {
         {expenses.map(exp => (
           <li key={exp.id} className="expense-item">
             <div>
-              <strong>{exp.category}</strong> — ₦{exp.amount.toFixed(2)}
+              <strong>{exp.category?.name}</strong> — ₦{formatAmount(exp.amount)}
               <div className="meta">
                 {new Date(exp.date).toLocaleDateString()}
                 {exp.note && ` • ${exp.note}`}

@@ -82,11 +82,36 @@ export const createCategory = async (req, res) => {
     });
   }
 };
+
+/**
+ * Update /api/categories/:id
+ */
+export const updateCategory = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { name } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ message: "Invalid category ID" });
+    }
+
+    const updated = await prisma.category.update({
+      where: { id: Number(id) },
+      data: { name },
+    });
+
+    res.json(updated);
+  } catch (error) {
+    console.error("Update category error:", error);
+    res.status(500).json({ message: "Failed to update category" });
+  }
+};
+
 /**
  * DELETE /api/categories/:id
  */
 export const deleteCategory = async (req, res) => {
-  const { id } = req.params;
+  const id = Number(req.params.id);
 
   try {
     await CategoryModel.delete(Number(id));

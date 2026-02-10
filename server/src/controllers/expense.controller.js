@@ -102,7 +102,16 @@ export const createExpense = async (req, res) => {
  */
 export const updateExpense = async (req, res) => {
   try {
-    const expense = await Expense.getExpenseById(req.params.id);
+    const id = Number(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid expense ID"
+      });
+    }
+
+    const expense = await Expense.getExpenseById(id);
 
     if (!expense || expense.user_id !== req.user.id) {
       return res.status(404).json({
@@ -111,7 +120,7 @@ export const updateExpense = async (req, res) => {
       });
     }
 
-    const updated = await Expense.updateExpense(req.params.id, req.body);
+    const updated = await Expense.updateExpense(id, req.body);
 
     res.status(200).json({
       success: true,
@@ -119,7 +128,6 @@ export const updateExpense = async (req, res) => {
     });
   } catch (error) {
     console.error("Update expense error:", error);
-
     res.status(500).json({
       success: false,
       error: "Failed to update expense"
@@ -132,7 +140,16 @@ export const updateExpense = async (req, res) => {
  */
 export const deleteExpense = async (req, res) => {
   try {
-    const expense = await Expense.getExpenseById(req.params.id);
+    const id = Number(req.params.id);
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid expense ID"
+      });
+    }
+
+    const expense = await Expense.getExpenseById(id);
 
     if (!expense || expense.user_id !== req.user.id) {
       return res.status(404).json({
@@ -141,7 +158,7 @@ export const deleteExpense = async (req, res) => {
       });
     }
 
-    await Expense.deleteExpense(req.params.id);
+    await Expense.deleteExpense(id);
 
     res.status(200).json({
       success: true,
@@ -149,10 +166,10 @@ export const deleteExpense = async (req, res) => {
     });
   } catch (error) {
     console.error("Delete expense error:", error);
-
     res.status(500).json({
       success: false,
       error: "Failed to delete expense"
     });
   }
 };
+

@@ -13,9 +13,10 @@ export default {
 
   async getExpenseById(id) {
     return prisma.expense.findUnique({
-      where: { id }
+      where: { id: Number(id) }
     });
   },
+
 
   async createExpense({ userId, categoryId, amount, date, note }) {
     return prisma.expense.create({
@@ -31,14 +32,14 @@ export default {
 
   async updateExpense(id, data) {
     return prisma.expense.update({
-      where: { id },
+      where: { id: Number(id) },
       data
     });
   },
 
   async deleteExpense(id) {
     return prisma.expense.delete({
-      where: { id }
+      where: { id: Number(id) }
     });
   }
 };

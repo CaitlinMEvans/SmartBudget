@@ -3,6 +3,7 @@ import {
   getAllCategories,
   getCategoryByName,
   createCategory,
+  updateCategory,
   deleteCategory
 } from "../controllers/category.controller.js";
 
@@ -33,6 +34,12 @@ router.get("/:id", getCategoryByName);
  * @access  Private
  */
 router.post("/", createCategory);
+/**
+ * @route   UPDATE /api/categories/:id
+ * @desc    Update category
+ * @access  Private
+ */
+router.put("/:id", updateCategory);
 
 /**
  * @route   DELETE /api/categories/:id

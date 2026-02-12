@@ -5,7 +5,7 @@ import authRoutes from "./src/routes/auth.routes.js";
 import categoryRoutes from "./src/routes/category.routes.js";
 import expenseRoutes from "./src/routes/expense.routes.js";
 import budgetRoutes from "./src/routes/budget.routes.js";
-import dasboardRoutes from "./src/routes/dashboard.routes.js";
+import dashboardRoutes from "./src/routes/dashboard.routes.js";
 
 dotenv.config();
 

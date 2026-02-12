@@ -73,34 +73,39 @@ const ExpensesPage = () => {
     setShowForm(false);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setSuccess('');
 
-    const payload = {
-      category: formData.category,
-      amount: Number(formData.amount),
-      date: formData.date,
-      note: formData.note
-    };
-
-    try {
-      if (editingExpense) {
-        await expenseService.updateExpense(editingExpense.id, payload);
-        setSuccess('Expense updated successfully');
-      } else {
-        await expenseService.createExpense(payload);
-        setSuccess('Expense added successfully');
-      }
-
-      await fetchData();
-      resetForm();
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to save expense');
-    }
+  const payload = {
+    category: formData.category,
+    amount: Number(formData.amount),
+    date: formData.date,
+    note: formData.note
   };
+
+  // DEBUG LOGS
+  console.log('Submitting expense:', payload);
+  console.log('Available categories:', categories);
+
+  try {
+    if (editingExpense) {
+      await expenseService.updateExpense(editingExpense.id, payload);
+      setSuccess('Expense updated successfully');
+    } else {
+      await expenseService.createExpense(payload);
+      setSuccess('Expense added successfully');
+    }
+
+    await fetchData();
+    resetForm();
+    setTimeout(() => setSuccess(''), 3000);
+  } catch (err) {
+    console.error('Full error:', err); 
+    setError(err.response?.data?.error || 'Failed to save expense');
+  }
+};
 
   const handleEdit = (expense) => {
     setEditingExpense(expense);

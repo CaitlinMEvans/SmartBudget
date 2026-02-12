@@ -64,6 +64,13 @@ export default function TopNav() {
               >
                 Categories
               </Link>
+              <Link
+                to="/dashboard"
+                style={styles.dropdownItem}
+                onClick={() => setIsDropdownOpen(false)}
+              >
+                Dashboard
+              </Link>
               {/* Add more secondary pages here as needed */}
             </div>
           )}

@@ -17,6 +17,27 @@ const CategoriesPage = () => {
     fetchAll();
   }, []);
 
+  useEffect(() => {
+  if (success) {
+    const timer = setTimeout(() => {
+      setSuccess('');
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }
+}, [success]);
+
+useEffect(() => {
+  if (error) {
+    const timer = setTimeout(() => {
+      setError('');
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }
+}, [error]);
+
+
   const fetchAll = async () => {
     await Promise.all([fetchCategories(), fetchCategorySpending()]);
   };
@@ -35,19 +56,24 @@ const CategoriesPage = () => {
   };
 
   const fetchCategorySpending = async () => {
-    try {
-      const stats = await expenseService.getExpenseStats();
-      const map = {};
+  try {
+    const stats = await expenseService.getExpenseStats();
+    const map = {};
 
-      stats.byCategory.forEach(cat => {
-        map[cat._id] = { total: cat.total, count: cat.count };
-      });
+    Object.entries(stats.byCategory).forEach(([categoryId, cat]) => {
+      map[categoryId] = {
+        total: Number(cat.total) || 0,
+        count: cat.count || 0
+      };
+    });
 
-      setCategorySpending(map);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    setCategorySpending(map);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -121,12 +147,13 @@ const CategoriesPage = () => {
         </form>
       )}
 
-      <ul>
+
+      <ul className="categories-list">
         {categories.map(cat => (
-          <li key={cat.id}>
-            <strong>{cat.name}</strong>
-            <span>
-              ₦{(categorySpending[cat.name]?.total || 0).toFixed(2)}
+          <li key={cat.id} className="category-card">
+            <strong className="category-header">{cat.name}</strong>
+            <span className="category-spending">
+              ${(categorySpending[cat.id]?.total || 0).toFixed(2)}
             </span>
             <button onClick={() => handleEdit(cat)}>Edit</button>
             <button onClick={() => handleDelete(cat.id)}>Delete</button>

@@ -82,11 +82,43 @@ export const createCategory = async (req, res) => {
     });
   }
 };
+
+/**
+ * Update /api/categories/:id
+ */
+export const updateCategory = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        error: "Category name is required"
+      });
+    }
+
+    const updated = await CategoryModel.update(id, name.toLowerCase());
+
+    res.status(200).json({
+      success: true,
+      data: updated
+    });
+
+  } catch (error) {
+    console.error("Update category error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to update category"
+    });
+  }
+};
+
 /**
  * DELETE /api/categories/:id
  */
 export const deleteCategory = async (req, res) => {
-  const { id } = req.params;
+  const id = Number(req.params.id);
 
   try {
     await CategoryModel.delete(Number(id));

@@ -9,6 +9,7 @@ import Categories from "./pages/Category";
 import Budget from "./pages/Budget";
 import Profile from "./pages/Profile";
 import AddBudget from "./pages/AddBudget";
+import DashboardPage from "./pages/Dashboard";
 
 function App() {
   return (
@@ -18,14 +19,16 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
         <Route 
           path="/budget" 
           element={
             <RequireAuth>
               <Budget />
             </RequireAuth>
-          } 
+          }
         />
+
         <Route 
           path="/budget/add" 
           element={
@@ -33,14 +36,14 @@ function App() {
               <AddBudget />
             </RequireAuth>
           } 
-        />
-        
+        />     
         {/* Example protected route */}
+
         <Route
           path="/dashboard"
           element={
             <RequireAuth>
-              <Home />
+              <DashboardPage />
             </RequireAuth>
           }
         />

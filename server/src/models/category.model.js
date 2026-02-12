@@ -37,7 +37,7 @@ export default {
    */
   async getById(id) {
     return prisma.category.findUnique({
-      where: { id },
+      where: { id: Number(id) },
       select: {
         id: true,
         name: true
@@ -75,13 +75,22 @@ export default {
       }
     });
   },
-
+  
+  /**
+   * Update category
+   */
+  update(id, name) {
+  return prisma.category.update({
+    where: { id: Number(id) },
+    data: { name }
+  });
+  },
   /**
    * Delete category
    */
   async delete(id) {
     return prisma.category.delete({
-      where: { id }
+      where: { id: Number(id) }
     });
   }
 };

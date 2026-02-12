@@ -65,7 +65,7 @@ const CategoryManager = () => {
     try {
       if (editingCategory) {
         // Update by category name
-        await categoryService.updateCategory(editingCategory.name, formData);
+        await categoryService.updateCategory(editingCategory.id, formData);
         setSuccess('Category updated successfully!');
       } else {
         // Create new category
@@ -99,11 +99,11 @@ const CategoryManager = () => {
   /**
    * Handle delete (by name)
    */
-  const handleDelete = async (name) => {
+  const handleDelete = async (category) => {
     if (!window.confirm('Are you sure you want to delete this category?')) return;
 
     try {
-      await categoryService.deleteCategory(name);
+      await categoryService.deleteCategory(category.id);
       setSuccess('Category deleted successfully!');
       await fetchCategories();
       setTimeout(() => setSuccess(''), 3000);
@@ -246,7 +246,7 @@ const CategoryManager = () => {
           <div className="categories-grid">
             {categories.map(category => (
               <div
-                key={category.name}
+                key={category.id}
                 className="category-card"
                 style={{ borderLeftColor: category.color }}
               >
@@ -272,7 +272,7 @@ const CategoryManager = () => {
                   </button>
                   {!category.isDefault && (
                     <button
-                      onClick={() => handleDelete(category.name)}
+                      onClick={() => handleDelete(category.id)}
                       className="btn-icon btn-delete"
                     >
                       🗑️

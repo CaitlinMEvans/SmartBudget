@@ -1,25 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import expenseService from '../services/expenseService';
 import categoryService from '../services/categoryService';
+import ExpenseFilter from '../components/ExpenseFilter';
 import './Expense.css';
 
 const ExpensesPage = () => {
   const [expenses, setExpenses] = useState([]);
+  const [filteredExpenses, setFilteredExpenses] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-
   const [showForm, setShowForm] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const [formData, setFormData] = useState({
-    category: '',
+    categoryId: '',
     amount: '',
-    date: '',
+    date: new Date().toISOString().split('T')[0],
     note: ''
   });
 
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [filters, setFilters] = useState({
+    category: '',
+    startDate: '',
+    endDate: ''
+  });
 
   useEffect(() => {
     fetchData();
@@ -34,112 +40,230 @@ const ExpensesPage = () => {
         categoryService.getAllCategories()
       ]);
 
-      setExpenses(expenseData);
-      setCategories(categoryData.map(c => c.name));
+      setExpenses(expenseData || []);
+      setCategories(categoryData || []);
+      setFilteredExpenses(expenseData || []);
       setError('');
-    } catch {
-      setError('Failed to load data');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to load expenses');
     } finally {
       setLoading(false);
     }
   };
 
+  /* ---------------- FILTERING ---------------- */
+  useEffect(() => {
+    let result = [...expenses];
+
+    if (filters.category) {
+      result = result.filter(
+        exp => exp.categoryId === Number(filters.category)
+      );
+    }
+
+    if (filters.startDate) {
+      result = result.filter(
+        exp => exp.date.split('T')[0] >= filters.startDate
+      );
+    }
+
+    if (filters.endDate) {
+      result = result.filter(
+        exp => exp.date.split('T')[0] <= filters.endDate
+      );
+    }
+
+    result.sort((a, b) =>
+      new Date(b.date) - new Date(a.date)
+    );
+
+    setFilteredExpenses(result);
+    
+  }, [expenses, filters]);
+
+  /* APPLY FILTER */
+const applyFilters = (filterValues) => {
+  let result = [...expenses];
+
+  if (filterValues.category) {
+    result = result.filter(
+      exp => exp.categoryId === Number(filterValues.category)
+    );
+  }
+
+  if (filterValues.startDate) {
+    result = result.filter(
+      exp => exp.date.split('T')[0] >= filterValues.startDate
+    );
+  }
+
+  if (filterValues.endDate) {
+    result = result.filter(
+      exp => exp.date.split('T')[0] <= filterValues.endDate
+    );
+  }
+
+  result.sort((a, b) =>
+    new Date(b.date) - new Date(a.date)
+  );
+
+  setFilteredExpenses(result);
+};
+
+
+/* RESET FILTER */
+const resetFilters = () => {
+  setFilteredExpenses(expenses);  // restore full list
+};
+
+
+  /* ---------------- INPUT ---------------- */
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'amount' ? value.replace(/[^\d.]/g, '') : value
+      [name]: value
     }));
   };
 
-  const resetForm = () => {
-    setFormData({ category: '', amount: '', date: '', note: '' });
-    setEditingExpense(null);
-    setShowForm(false);
-  };
+  /* ---------------- SUBMIT ---------------- */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
-  setSuccess('');
+    try {
+      const payload = {
+        categoryId: Number(formData.categoryId),
+        amount: Number(formData.amount),
+        date: formData.date,
+        note: formData.note || null
+      };
 
-  const payload = {
-    category: formData.category,
-    amount: Number(formData.amount),
-    date: formData.date,
-    note: formData.note
-  };
+      if (editingExpense) {
+        await expenseService.updateExpense(editingExpense.id, payload);
+        setSuccess('Expense updated!');
+      } else {
+        await expenseService.createExpense(payload);
+        setSuccess('Expense added!');
+      }
 
-  // DEBUG LOGS
-  console.log('Submitting expense:', payload);
-  console.log('Available categories:', categories);
-
-  try {
-    if (editingExpense) {
-      await expenseService.updateExpense(editingExpense.id, payload);
-      setSuccess('Expense updated successfully');
-    } else {
-      await expenseService.createExpense(payload);
-      setSuccess('Expense added successfully');
+      resetForm();
+      await fetchData();
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to save expense');
     }
+  };
 
-    await fetchData();
-    resetForm();
-    setTimeout(() => setSuccess(''), 3000);
-  } catch (err) {
-    console.error('Full error:', err); 
-    setError(err.response?.data?.error || 'Failed to save expense');
-  }
-};
-
+  /* ---------------- EDIT ---------------- */
   const handleEdit = (expense) => {
     setEditingExpense(expense);
+
     setFormData({
-      category: expense.category,
-      amount: expense.amount.toString(),
-      date: expense.date.split('T')[0],
+      categoryId: expense.categoryId,
+      amount: expense.amount,
+      date: expense.date
+        ? expense.date.split('T')[0]
+        : '',
       note: expense.note || ''
     });
+
     setShowForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this expense?')) return;
 
-    try {
-      await expenseService.deleteExpense(id);
-      setSuccess('Expense deleted');
-      await fetchData();
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to delete expense');
-    }
+    await expenseService.deleteExpense(id);
+    await fetchData();
   };
 
-  if (loading) return <p>Loading expenses...</p>;
+  const resetForm = () => {
+    setFormData({
+      categoryId: '',
+      amount: '',
+      date: new Date().toISOString().split('T')[0],
+      note: ''
+    });
+    setEditingExpense(null);
+    setShowForm(false);
+  };
+
+  const exportToCSV = () => {
+  if (!filteredExpenses.length) {
+    alert("No data to export");
+    return;
+  }
+
+  const headers = ["Category", "Amount", "Date", "Note"];
+
+  const rows = filteredExpenses.map(exp => [
+    exp.category,
+    exp.amount,
+    new Date(exp.date).toLocaleDateString(),
+    exp.note || ""
+  ]);
+
+  const csvContent =
+    [headers, ...rows]
+      .map(row => row.join(","))
+      .join("\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute(
+    "download",
+    `expenses-${new Date().toISOString().split("T")[0]}.csv`
+  );
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+
+  const getTotalAmount = () =>
+    filteredExpenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
+
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div className="expenses-page">
       <h1>💰 Expense Tracker</h1>
 
-      {error && <div className="alert error">{error}</div>}
-      {success && <div className="alert success">{success}</div>}
+      {error && <div className="alert error-alert">{error}</div>}
+      {success && <div className="alert success-alert">{success}</div>}
 
-      <button className="primary-btn" onClick={() => setShowForm(!showForm)}>
-        {showForm ? 'Cancel' : 'Add Expense'}
+
+      {/*  ADD EXPENSE BUTTON */}
+      <button
+        onClick={() => {
+          resetForm();
+          setShowForm(true);
+        }}
+        className="add-expense-btn"
+      >
+        ➕ Add Expense
       </button>
 
       {showForm && (
         <form onSubmit={handleSubmit} className="expense-form">
           <select
-            name="category"
-            value={formData.category}
+            name="categoryId"
+            value={formData.categoryId}
             onChange={handleInputChange}
             required
           >
             <option value="">Select category</option>
             {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
             ))}
           </select>
 
@@ -148,10 +272,8 @@ const handleSubmit = async (e) => {
             name="amount"
             value={formData.amount}
             onChange={handleInputChange}
-            placeholder="Amount"
+            placeholder="Enter amount (e.g. 5000)"
             required
-            min="0"
-            step="0.01"
           />
 
           <input
@@ -167,32 +289,44 @@ const handleSubmit = async (e) => {
             name="note"
             value={formData.note}
             onChange={handleInputChange}
-            placeholder="Note (optional)"
+            placeholder="Enter description (e.g. Electricity bill)"
           />
 
           <button type="submit">
             {editingExpense ? 'Update Expense' : 'Add Expense'}
           </button>
+
+          <button type="button" onClick={resetForm}>
+            Cancel
+          </button>
         </form>
       )}
 
-      <ul className="expenses-list">
-        {expenses.map(exp => (
-          <li key={exp.id} className="expense-item">
-            <div>
-              <strong>{exp.category}</strong> — ₦{exp.amount.toFixed(2)}
-              <div className="meta">
-                {new Date(exp.date).toLocaleDateString()}
-                {exp.note && ` • ${exp.note}`}
-              </div>
-            </div>
+      <ExpenseFilter
+        categories={categories}
+        filters={filters}
+        onFilterChange={setFilters}
+        onApplyFilter={applyFilters}
+        onResetFilter={resetFilters}
+      />
 
-            <div className="actions">
-              <button onClick={() => handleEdit(exp)}>Edit</button>
-              <button className="danger" onClick={() => handleDelete(exp.id)}>
-                Delete
-              </button>
-            </div>
+      <h3>Total: ₦{getTotalAmount().toFixed(2)}</h3>
+
+      <button
+        onClick={exportToCSV}
+        className="export-btn"
+      >
+        📥 Export CSV
+      </button>
+
+
+      <ul>
+        {filteredExpenses.map(exp => (
+          <li key={exp.id}>
+            <strong>{exp.category}</strong> — ₦{exp.amount.toFixed(2)} —
+            {new Date(exp.date).toLocaleDateString()}
+            <button onClick={() => handleEdit(exp)}>Edit</button>
+            <button onClick={() => handleDelete(exp.id)}>Delete</button>
           </li>
         ))}
       </ul>

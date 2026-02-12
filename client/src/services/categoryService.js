@@ -1,7 +1,7 @@
 // src/services/categoryService.js
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 // Helper to get auth headers
 const getAuthHeaders = () => {
@@ -16,7 +16,8 @@ const getAuthHeaders = () => {
 const categoryService = {
   // Get all categories
   getAllCategories: async () => {
-    const response = await axios.get(`${API_URL}/categories`, getAuthHeaders());
+
+  const response = await axios.get(`${API_URL}/categories`, getAuthHeaders());
     return response.data.data; // backend wraps in { success, data }
   },
 
@@ -32,17 +33,17 @@ const categoryService = {
     return response.data.data;
   },
 
-  // Update category
-  updateCategory: async (oldName, { name }) => {
-    const response = await axios.put(`${API_URL}/categories/${oldName}`, { name }, getAuthHeaders());
-    return response.data.data;
+  // Update category BY ID 
+  updateCategory: async (id, { name }) => {
+    const response = await axios.put(`${API_URL}/categories/${id}`, { name }, getAuthHeaders());
+    return response.data;
   },
 
-  // Delete category
-  deleteCategory: async (name) => {
-    const response = await axios.delete(`${API_URL}/categories/${name}`, getAuthHeaders());
-    return response.data.data;
-  }
-};
-
+  // Delete category BY ID 
+  deleteCategory: async (id) => {
+    const response = await axios.delete(`${API_URL}/categories/${id}`, getAuthHeaders());
+    return response.data;
+  },
+}
+  
 export default categoryService;

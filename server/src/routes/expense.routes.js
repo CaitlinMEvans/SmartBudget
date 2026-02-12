@@ -1,7 +1,7 @@
 import express from "express";
 import {
   getAllExpenses,
-  getExpenseById,
+  //getExpenseById,
   createExpense,
   updateExpense,
   deleteExpense
@@ -26,7 +26,7 @@ router.get("/", getAllExpenses);
  * @desc    Get single expense by ID
  * @access  Private
  */
-router.get("/:id", getExpenseById);
+//router.get("/:id", getExpenseById);
 
 /**
  * @route   POST /api/expenses

@@ -1,9 +1,8 @@
 // src/services/expenseService.js
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-// Helper to get auth headers
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -14,58 +13,81 @@ const getAuthHeaders = () => {
 };
 
 const expenseService = {
-  // Get all expenses
-  getAllExpenses: async () => {
-    const response = await axios.get(`${API_URL}/expenses`, getAuthHeaders());
-    return response.data.data; // array of expenses
+
+  // GET ALL
+  getAllExpenses: async (filters = {}) => {
+    const params = new URLSearchParams(filters);
+    const response = await axios.get(
+      `${API_URL}/expenses?${params.toString()}`,
+      getAuthHeaders()
+    );
+    return response.data.data;
   },
 
-  // Get expense by ID
+  // GET BY ID
   getExpenseById: async (id) => {
-    const response = await axios.get(`${API_URL}/expenses/${id}`, getAuthHeaders());
+    const response = await axios.get(
+      `${API_URL}/expenses/${id}`,
+      getAuthHeaders()
+    );
     return response.data.data;
   },
 
-  // Create expense
-  createExpense: async ({ category, amount, date, note }) => {
-    const response = await axios.post(`${API_URL}/expenses`, { category, amount, date, note }, getAuthHeaders());
+  // CREATE (NOW USES categoryId)
+  createExpense: async ({ categoryId, amount, date, note }) => {
+    const response = await axios.post(
+      `${API_URL}/expenses`,
+      { categoryId, amount, date, note },
+      getAuthHeaders()
+    );
     return response.data.data;
   },
 
-  // Update expense
-  updateExpense: async (id, { category, amount, date, note }) => {
-    const response = await axios.put(`${API_URL}/expenses/${id}`, { category, amount, date, note }, getAuthHeaders());
+  // UPDATE (NOW USES categoryId)
+  updateExpense: async (id, { categoryId, amount, date, note }) => {
+    const response = await axios.put(
+      `${API_URL}/expenses/${id}`,
+      { categoryId, amount, date, note },
+      getAuthHeaders()
+    );
     return response.data.data;
   },
 
-  // Delete expense
+  // DELETE
   deleteExpense: async (id) => {
-    const response = await axios.delete(`${API_URL}/expenses/${id}`, getAuthHeaders());
-    return response.data.data;
+    await axios.delete(
+      `${API_URL}/expenses/${id}`,
+      getAuthHeaders()
+    );
   },
 
-  // Compute simple stats (frontend since backend doesn't have /stats yet)
+  // SIMPLE FRONTEND STATS
   getExpenseStats: async () => {
     const expenses = await expenseService.getAllExpenses();
 
-    // Aggregate by category
     const byCategory = {};
     let totalExpenses = 0;
+
     expenses.forEach(exp => {
       totalExpenses += exp.amount;
-      if (!byCategory[exp.category]) byCategory[exp.category] = { total: 0, count: 0 };
-      byCategory[exp.category].total += exp.amount;
-      byCategory[exp.category].count += 1;
+
+      if (!byCategory[exp.categoryId]) {
+        byCategory[exp.categoryId] = {
+          name: exp.category,
+          total: 0,
+          count: 0
+        };
+      }
+
+      byCategory[exp.categoryId].total += exp.amount;
+      byCategory[exp.categoryId].count += 1;
     });
 
-    const categoryStats = Object.keys(byCategory).map(cat => ({
-      _id: cat,
-      total: byCategory[cat].total,
-      count: byCategory[cat].count,
-      percentage: 0 // optional
-    }));
-
-    return { totalExpenses, expenseCount: expenses.length, byCategory: categoryStats };
+    return {
+      totalExpenses,
+      expenseCount: expenses.length,
+      byCategory
+    };
   }
 };
 

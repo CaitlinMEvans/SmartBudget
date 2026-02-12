@@ -246,7 +246,7 @@ const CategoryManager = () => {
           <div className="categories-grid">
             {categories.map(category => (
               <div
-                key={category.name}
+                key={category.id}
                 className="category-card"
                 style={{ borderLeftColor: category.color }}
               >
@@ -272,7 +272,7 @@ const CategoryManager = () => {
                   </button>
                   {!category.isDefault && (
                     <button
-                      onClick={() => handleDelete(category.name)}
+                      onClick={() => handleDelete(category.id)}
                       className="btn-icon btn-delete"
                     >
                       🗑️

@@ -33,13 +33,13 @@ const categoryService = {
     return response.data.data;
   },
 
-  // Update category BY ID ✅
+  // Update category BY ID 
   updateCategory: async (id, { name }) => {
-    const response = await axios.put(`${API_URL}/categories/${id}`, { name });
+    const response = await axios.put(`${API_URL}/categories/${id}`, { name }, getAuthHeaders());
     return response.data;
   },
 
-  // Delete category BY ID ✅
+  // Delete category BY ID 
   deleteCategory: async (id) => {
     const response = await axios.delete(`${API_URL}/categories/${id}`, getAuthHeaders());
     return response.data;

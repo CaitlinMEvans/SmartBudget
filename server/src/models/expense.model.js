@@ -1,13 +1,31 @@
-import {prisma} from "../db/prisma.js";
+import { prisma } from "../db/prisma.js";
 
 export default {
-  async getExpensesByUserId(userId) {
+  async getExpensesByUserId(userId, filters = {}) {
+    const { category, startDate, endDate } = filters;
+
+    const where = {
+      userId
+    };
+
+    // Category filter (by name via relation)
+    if (category) {
+      where.category = {
+        name: category
+      };
+    }
+
+    // Date range filter
+    if (startDate || endDate) {
+      where.expenseDate = {};
+      if (startDate) where.expenseDate.gte = new Date(startDate);
+      if (endDate) where.expenseDate.lte = new Date(endDate);
+    }
+
     return prisma.expense.findMany({
-      where: { userId },
+      where,
       orderBy: { expenseDate: "desc" },
-      include: {
-        category: true
-      }
+      include: { category: true }
     });
   },
 
@@ -16,7 +34,6 @@ export default {
       where: { id: Number(id) }
     });
   },
-
 
   async createExpense({ userId, categoryId, amount, date, note }) {
     return prisma.expense.create({

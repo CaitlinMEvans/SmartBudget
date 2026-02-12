@@ -8,7 +8,8 @@ import Expenses from "./pages/Expense";
 import Categories from "./pages/Category";
 import Budget from "./pages/Budget";
 import Profile from "./pages/Profile";
->>>>>>>>> Temporary merge branch 2
+import AddBudget from "./pages/AddBudget";
+import DashboardPage from "./pages/Dashboard";
 
 function App() {
   return (
@@ -18,21 +19,34 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/budget" element={
-            <RequireAuth>
-              <Budget />
-            </RequireAuth>} />
 
-          {/* Example protected route */}
-        <Route
-          path="/dashboard"
+        <Route 
+          path="/budget" 
           element={
             <RequireAuth>
-              <Home />
+              <Budget />
             </RequireAuth>
           }
         />
 
+        <Route 
+          path="/budget/add" 
+          element={
+            <RequireAuth>
+              <AddBudget />
+            </RequireAuth>
+          } 
+        />     
+        {/* Example protected route */}
+
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <DashboardPage />
+            </RequireAuth>
+          }
+        />
         <Route
           path="/expenses"
           element={
@@ -46,7 +60,10 @@ function App() {
           element={
             <RequireAuth>
               <Categories />
-=========
+            </RequireAuth>
+          }
+        />
+        <Route
           path="/profile"
           element={
             <RequireAuth>

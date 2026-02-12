@@ -91,19 +91,26 @@ export const updateCategory = async (req, res) => {
     const id = Number(req.params.id);
     const { name } = req.body;
 
-    if (!id) {
-      return res.status(400).json({ message: "Invalid category ID" });
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        error: "Category name is required"
+      });
     }
 
-    const updated = await prisma.category.update({
-      where: { id: Number(id) },
-      data: { name },
+    const updated = await CategoryModel.update(id, name.toLowerCase());
+
+    res.status(200).json({
+      success: true,
+      data: updated
     });
 
-    res.json(updated);
   } catch (error) {
     console.error("Update category error:", error);
-    res.status(500).json({ message: "Failed to update category" });
+    res.status(500).json({
+      success: false,
+      error: "Failed to update category"
+    });
   }
 };
 

@@ -1,189 +1,187 @@
-/* Page container */
+/* --- Variables (Matching Expense.css) --- */
+:root {
+  --primary-color: #2ecc71;
+  --secondary-color: #27ae60;
+  --danger-color: #e74c3c;
+  --info-color: #3498db;
+  --text-dark: #2c3e50;
+  --bg-light: #f8f9fa;
+  --white: #ffffff;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --border-radius: 12px;
+}
+
 .categories-page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: var(--text-dark);
+  background-color: var(--bg-light);
+  min-height: 100vh;
 }
 
-/* Page title */
-.categories-page h1 {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  color: #4f46e5;
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 800;
 }
 
-/* Alerts */
+/* --- Alerts (Matching Expense.css) --- */
 .alert {
   padding: 12px 16px;
-  margin-bottom: 16px;
-  border-radius: 6px;
+  margin: 1rem 0;
+  border-radius: 8px;
   font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: fadeIn 0.3s ease-in-out;
+  border-left: 5px solid;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .alert-error {
-  background-color: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
+  background-color: #fff5f5;
+  color: #c53030;
+  border-color: #fc8181;
 }
 
 .alert-success {
-  background-color: #dcfce7;
-  color: #166534;
-  border: 1px solid #bbf7d0;
+  background-color: #f0fff4;
+  color: #22543d;
+  border-color: #68d391;
 }
 
-/* Primary action button */
-.categories-page > button {
-  margin-bottom: 20px;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  background-color: #4f46e5;
-  color: #ffffff;
-  font-weight: 500;
+/* --- Buttons --- */
+button {
   cursor: pointer;
-  transition: background 0.2s;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  padding: 0.6rem 1.2rem;
+}
+
+.categories-page > button { /* The "Add Category" toggle button */
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
 }
 
 .categories-page > button:hover {
-  background-color: #4338ca;
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
 }
 
-/* Category form */
-.category-form {
+/* --- Form --- */
+form {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
   display: flex;
   gap: 10px;
-  margin-bottom: 24px;
+  animation: slideDown 0.3s ease-out;
 }
 
-.category-form input {
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+form input {
   flex: 1;
-  padding: 10px;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
   border-radius: 6px;
-  border: 1px solid #d1d5db;
-  font-size: 0.95rem;
-}
-
-.category-form input:focus {
+  font-size: 1rem;
   outline: none;
-  border-color: #4f46e5;
 }
 
-.category-form button {
-  padding: 10px 18px;
-  border-radius: 6px;
-  border: none;
-  background-color: #10b981;
-  color: #ffffff;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
+form input:focus {
+  border-color: var(--primary-color);
 }
 
-.category-form button:hover {
-  background-color: #059669;
+form button[type="submit"] {
+  background-color: var(--primary-color);
+  color: white;
 }
 
-/* Categories list */
+/* --- Category List & Cards --- */
 .categories-list {
   list-style: none;
   padding: 0;
-  margin-top: 10px;
 }
 
-.categories-list li {
-  display: grid;
-  grid-template-columns: 1fr 2fr auto auto;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  margin-bottom: 10px;
-  background-color:#302f2f;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-}
-
-/* Category name */
-.categories-list li span:first-child {
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-/* Spending info */
-.categories-list li span:nth-child(2) {
-  font-size: 0.9rem;
-  color: #6b7280;
-}
-
-/* Action buttons */
-.categories-list button {
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: none;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-/* Edit button */
-.categories-list button:nth-of-type(1) {
-  background-color: #e0e7ff;
-  color: #3730a3;
-}
-
-.categories-list button:nth-of-type(1):hover {
-  background-color: #c7d2fe;
-}
-
-/* Delete button */
-.categories-list button:nth-of-type(2) {
-  background-color: #fee2e2;
-  color: #991b1b;
-}
-
-.categories-list button:nth-of-type(2):hover {
-  background-color: #fecaca;
-}
-
-/* Empty state */
-.categories-page p {
-  color: #6b7280;
-  font-style: italic;
-}
 .category-card {
-  background: white;
-  padding: 16px;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  background: var(--white);
+  margin-bottom: 1rem;
+  padding: 1.2rem;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  gap: 15px;
+  transition: transform 0.2s;
 }
 
-.category-header h3 {
-  color: #333;
-  margin: 0 0 8px 0;
-  font-size: 18px;
+.category-card:hover {
+  transform: scale(1.01);
+}
+
+.category-header {
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  flex: 1;
 }
 
 .category-spending {
-  color: #666;
-  margin: 8px 0;
+  font-weight: bold;
+  color: var(--primary-color);
+  background: #f0fff4;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.9rem;
 }
 
-.category-actions {
-  margin-top: 12px;
-  display: flex;
-  gap: 8px;
+/* Card Actions */
+.category-card button {
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
 }
 
-.category-actions button {
-  padding: 6px 12px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  background: white;
-  color: #333;
-  cursor: pointer;
+.category-card button:nth-of-type(1) { /* Edit */
+  background-color: var(--info-color);
+  color: white;
 }
 
-.category-actions button:hover {
-  background: #f5f5f5;
+.category-card button:nth-of-type(2) { /* Delete */
+  background-color: var(--danger-color);
+  color: white;
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+  .category-card {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  
+  form {
+    flex-direction: column;
+  }
 }

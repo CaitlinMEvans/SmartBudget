@@ -11,22 +11,27 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors({
+  origin: true, // Temporarily allow all for testing
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // ==========================
-// Routes
+// Routes (ALL routes should be here, BEFORE error handler)
 // ==========================
 app.get("/", (req, res) => res.json({ ok: true }));
 
 app.use("/auth", authRoutes);
-app.use('/categories', categoryRoutes);
-app.use('/expenses', expenseRoutes);
-app.use('/budgets', budgetRoutes);
-app.use('/dashboard', dasboardRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use("/budget", budgetRoutes);
+app.use("/dashboard", dashboardRoutes);
 
 // ==========================
-// Error Handler (Optional but Recommended)
+// Error Handler (Should be LAST)
 // ==========================
 app.use((err, req, res, next) => {
   console.error(err.stack);

@@ -54,7 +54,6 @@ button {
 
 /* --- Form Styles --- */
 .expense-form {
-  background: #6b7280;
   padding: 1.5rem;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);

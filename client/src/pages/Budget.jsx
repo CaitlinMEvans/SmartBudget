@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { request } from "../api/authApi.js";
 import { useEffect, useState } from "react";
 import BudgetContainer from "../components/BudgetContainer.jsx";
-import categoryService from "../services/categoryService.js";
 
 export default function Budget() {
   const [budgets, setBudgets] = useState([]);
@@ -14,10 +13,6 @@ export default function Budget() {
         setBudgets(allBudgets.budgets);
     });
   }, [])
-
-  function addBudget() {
-
-  }
 
   if (budgets.length <= 0) {
     return (
@@ -44,7 +39,6 @@ export default function Budget() {
       <div style={styles.budgetContainer}>
         <BudgetContainer budgets={budgets}/>
       </div>
-      {/* <BudgetForm></BudgetForm> */}
     </>
   )
 }

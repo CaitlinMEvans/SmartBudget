@@ -11,6 +11,9 @@ export async function getBudgets(req, res) {
     if (!userId) return res.status(401).json({ error: "Unauthorized." });
 
     const budgets = await prisma.budget.findMany({
+      include: {
+        category: true,
+      },
       where: { userId },
       orderBy: { createdAt: "desc" },
     });

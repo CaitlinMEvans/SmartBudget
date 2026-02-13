@@ -27,7 +27,7 @@ export default function BudgetCard({ budget }) {
     <div className="dashboard-card">
       <div className="dashboard-header">
         <h2>{budgetPeriodName} Budget</h2>
-        <span className="category">{budget.category ?? "Uncategorized"}</span>
+        <span className="category">{budget.category.name ?? "Uncategorized"}</span>
       </div>
 
       <div className="amounts">

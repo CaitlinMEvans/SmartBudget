@@ -25,7 +25,8 @@ export default function Home() {
 
   return (
     <div style={{ padding: 16 }}>
-      <h1>SmartBudget</h1>
+      <h1>SmartBudget Dashboard</h1>
+      <p>Quick Visual Summaries of your student spending with your created categories, expenses, and even budgets!</p>
 
       {isAuthed ? (
         <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>

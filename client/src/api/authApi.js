@@ -1,5 +1,8 @@
 // client/src/api/authApi.js
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD 
+    ? "https://smartbudget-kq3w.onrender.com"  // Production backend
+    : "http://localhost:8080");              // Local dev
 
 async function request(path, body = null, method = "POST") {
   const token = localStorage.getItem("token");

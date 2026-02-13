@@ -1,11 +1,11 @@
 /* --- Variables (Matching Expense.css) --- */
 :root {
-  --primary-color: #2ecc71;
+  --primary-color: #0066cc;
   --secondary-color: #27ae60;
   --danger-color: #e74c3c;
   --info-color: #3498db;
-  --text-dark: #2c3e50;
-  --bg-light: #f8f9fa;
+  --text-dark: #1f2937;
+  --bg-light: #f9fafb;
   --white: #ffffff;
   --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --border-radius: 12px;

@@ -1,13 +1,13 @@
 :root {
   /* Accessible color palette */
-  --primary: #FFF;        /* Blue - good contrast */
+  --primary: #FFF;       
   --primary-hover: #0052a3;
-  --success: #047857;        /* Green - WCAG AA compliant */
+  --success: #047857;        
   --danger: #dc2626;         /* Red */
   --warning: #d97706;        /* Orange */
   --text-primary: #f4f6f9;   /* Dark gray for text */
   --text-secondary: #6b7280;
-  /* --bg-main: #ffffff; */
+  --bg-main: #282828;
   --bg-secondary: #282828;
   --border: #e5e7eb;
   

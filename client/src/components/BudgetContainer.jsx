@@ -7,11 +7,11 @@ export default function BudgetContainer({ budgets }) {
     return (
       <div className="dashboard-empty">
         <p>No active budgets found. Please create a budget to get started.</p>
-        <p>
+        <button>
           <Link to="/budget/add" className="btn">
             Create budget
           </Link>
-        </p>
+        </button>
       </div>
     );
   }

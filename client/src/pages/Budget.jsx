@@ -20,6 +20,11 @@ export default function Budget() {
     return (
       <div>
         <p>No budgets found. Please create a budget to get started.</p>
+          <button>
+          <Link to="/budget/add" className="btn">
+            Create budget
+          </Link>
+          </button>
       </div>
     );
   }

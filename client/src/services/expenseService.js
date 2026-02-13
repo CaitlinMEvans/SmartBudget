@@ -1,7 +1,11 @@
 // src/services/expenseService.js
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_BASE = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD 
+    ? "https://smartbudget-kq3w.onrender.com"  // Production backend
+    : "http://localhost:8080");              // Local dev
+
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');

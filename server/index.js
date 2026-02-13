@@ -27,8 +27,8 @@ app.get("/", (req, res) => res.json({ ok: true }));
 app.use("/auth", authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/expenses', expenseRoutes);
-app.use("/budget", budgetRoutes);
-app.use("/dashboard", dashboardRoutes);
+app.use("/api/budget", budgetRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // ==========================
 // Error Handler (Should be LAST)

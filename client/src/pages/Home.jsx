@@ -12,7 +12,7 @@ export default function Home() {
 
     let isMounted = true;
 
-    request("/dashboard", null, "GET").then(data => {
+    request("/budget", null, "GET").then(data => {
       if (isMounted) {
         setBudgets(data.budgets);
       }

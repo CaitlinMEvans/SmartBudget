@@ -1,14 +1,17 @@
 import { Link } from "react-router-dom";
 import { request } from "../api/authApi.js";
 import { useEffect, useState } from "react";
-import BudgetContainer from "../components/BudgetContainer.jsx"
+import BudgetContainer from "../components/BudgetContainer.jsx";
+import categoryService from "../services/categoryService.js";
 
 export default function Budget() {
   const [budgets, setBudgets] = useState([]);
 
   useEffect(() => {
     request("/budget", null, "GET").then(allBudgets => {
-      setBudgets(allBudgets.budgets);
+      // Make sure the request sent back actual data
+      if (allBudgets && allBudgets.budgets)
+        setBudgets(allBudgets.budgets);
     });
   }, [])
 

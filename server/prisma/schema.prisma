@@ -23,6 +23,7 @@ model Category {
   id       Int       @id @default(autoincrement())
   name     String    @unique
   expenses Expense[]
+  budgets Budget[]
 
   @@map("categories")
 }
@@ -44,16 +45,18 @@ model Expense {
 }
 
 model Budget {
-  id        Int       @id @default(autoincrement())
-  userId    Int
-  category  String
-  limit     Decimal   @db.Decimal(10, 2)
-  spent     Decimal   @default(0) @db.Decimal(10, 2)
-  period    String
-  startDate DateTime
-  endDate   DateTime
-  createdAt DateTime  @default(now())
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  categoryId  Int
+  limit       Decimal   @db.Decimal(10, 2)
+  spent       Decimal   @default(0) @db.Decimal(10, 2)
+  period      String
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
   expenses  Expense[]
 
   @@map("budgets")

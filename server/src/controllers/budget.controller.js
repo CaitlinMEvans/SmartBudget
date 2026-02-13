@@ -61,13 +61,13 @@ export async function postBudget(req, res) {
     const userId = req.user?.userId;
     if (!userId) return res.status(401).json({ error: "Unauthorized." });
 
-    let { category, limit, period, startDate } = req.body || {};
+    let { categoryId, limit, period, startDate } = req.body || {};
 
-    if (!category || limit === undefined || !period || !startDate) {
+    if (!categoryId || limit === undefined || !period || !startDate) {
       return res.status(400).json({ error: "Missing required fields." });
     }
 
-    category = String(category).trim();
+    categoryId = Number(categoryId);
     period = String(period).toLowerCase().trim();
 
     const numericLimit = Number(limit);
@@ -92,11 +92,11 @@ export async function postBudget(req, res) {
     const newBudget = await prisma.budget.create({
       data: {
         userId,
-        category,
+        categoryId,
         limit: numericLimit,
         period,
         startDate: start,
-        endDate: end,
+        endDate: end
         // spent defaults to 0 via Prisma schema
       },
     });
@@ -125,15 +125,15 @@ export async function putBudget(req, res) {
       return res.status(400).json({ error: "Invalid budget id." });
     }
 
-    let { category, limit, period, startDate, spent } = req.body || {};
+    let { categoryId, limit, period, startDate, spent } = req.body || {};
 
     // Optional fields: allow partial updates, but validate anything provided
     const data = {};
 
-    if (category !== undefined) {
-      const c = String(category).trim();
-      if (!c) return res.status(400).json({ error: "Category cannot be empty." });
-      data.category = c;
+    if (categoryId !== undefined) {
+      const c = Number(categoryId);
+      if (!c) return res.status(400).json({ error: "Category must be selected." });
+      data.categoryId = c;
     }
 
     if (limit !== undefined) {

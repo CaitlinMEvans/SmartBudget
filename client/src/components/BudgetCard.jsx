@@ -4,7 +4,7 @@ export default function BudgetCard({ budget }) {
   if (!budget) return null;
 
   const limit = Number.parseFloat(budget.limit ?? 0);
-  const spent = Number.parseFloat(budget.spent ?? 0);
+  const spent = Number.parseFloat(budget.expenses.reduce((sum, expense) => sum + expense.amount, 0) ?? 0);
 
   const remaining = limit - spent;
 

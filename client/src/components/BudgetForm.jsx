@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { request } from "../api/authApi";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import "./BudgetForm.css";
 import { useNavigate } from "react-router-dom";
 import categoryService from "../services/categoryService";
@@ -12,7 +10,7 @@ export default function BudgetForm() {
   const [categories, setCategories] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(0);
   const [limit, setLimit] = useState("");
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
   const [period, setPeriod] = useState("weekly");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -32,7 +30,6 @@ export default function BudgetForm() {
     setSuccess(false);
 
     const numericLimit = Number(limit);
-
     if (!selectedCategoryId) {
       setError("Category is required.");
       return;
@@ -52,7 +49,7 @@ export default function BudgetForm() {
           categoryId: selectedCategoryId,
           limit: numericLimit,
           period,
-          startDate: startDate.toISOString(),
+          startDate: new Date(startDate).toISOString(),
         },
         "POST"
       );
@@ -77,7 +74,7 @@ export default function BudgetForm() {
     <form onSubmit={handleSubmit}>
       <h2>Set Your Budget</h2>
 
-      <label>
+      <label className="flex-label">
         Category:
         <select
             name="categoryId"
@@ -94,7 +91,7 @@ export default function BudgetForm() {
           </select>
       </label>
 
-      <label>
+      <label className="flex-label">
         Limit:
         <input
           type="number"
@@ -105,9 +102,15 @@ export default function BudgetForm() {
         />
       </label>
 
-      <label>
+      <label className="flex-label">
         Start date:
-        <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} />
+        <input
+          type="date"
+          name="date"
+          value={startDate}
+          onChange={(event) => setStartDate(event.target.value)}
+          required
+        />
       </label>
 
       <fieldset>

@@ -1,11 +1,10 @@
 // src/services/categoryService.js
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_URL || 
+const API_URL = import.meta.env.VITE_API_URL || 
   (import.meta.env.PROD 
-    ? "https://smartbudget-kq3w.onrender.com"  // Production backend
-    : "http://localhost:8080");              // Local dev
-
+    ? "https://smartbudget-kq3w.onrender.com"
+    : "http://localhost:8080");
 
 // Helper to get auth headers
 const getAuthHeaders = () => {

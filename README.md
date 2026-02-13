@@ -10,8 +10,6 @@
 
 SmartBudget is a web application designed to help students track expenses, manage budgets, and better understand their spending habits. The app focuses on simplicity, clarity, and real-world usefulness, allowing users to record daily expenses, organize them into categories, set weekly or monthly budgets, and view spending summaries through a clean dashboard.
 
-This project is being developed as part of **CSE 499 – Senior Project** using an Agile, sprint-based approach.
-
 ---
 
 ## Table of Contents
@@ -21,9 +19,6 @@ This project is being developed as part of **CSE 499 – Senior Project** using 
 - [Tech Stack](#tech-stack)
 - [Quick Start](#quick-start)
 - [Documentation](#documentation)
-- [Project Status](#project-status)
-- [Team](#team)
-- [License](#license)
 
 ---
 
@@ -40,20 +35,27 @@ Most existing financial tools are either too complex or not tailored for student
 - ✅ Secure user authentication (register, login, logout)
 - ✅ JWT-based session management
 - ✅ Add, edit, and delete expenses
-- ✅ Categorize expenses (e.g., food, rent, transport)
-- ✅ Set weekly or monthly budgets
-- ✅ Dashboard summary showing spending vs. budget
+- ✅ Add, edit, and delete expenses Categorize expenses (e.g., food, rent, transport)
 - ✅ Filter expenses by category and date
+- ✅ Add, edit, and delete expenses weekly or monthly budgets
+- ✅ Dashboard summary
 
 ### Planned Enhancements
 
-- Visual charts (spending by category)
-- Export expense history (CSV)
-- Savings goal tracking
-- Dark mode / light mode
-- Accessibility and performance improvements
+- ✅User can access their profile page and edit their password after successful login
+- ✅ Export expense history (CSV)
+- Visual charts on dashboard
 
 > Final enhancement scope will be determined during sprint planning.
+
+## Deployment Details
+- Site has been deployed live 
+
+### Frontend
+- Vercel: https://smart-budget-one.vercel.app/ 
+
+### Backend / DB
+- Render: https://smartbudget-kq3w.onrender.com
 
 ---
 

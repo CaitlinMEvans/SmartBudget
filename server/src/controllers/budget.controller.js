@@ -12,13 +12,44 @@ export async function getBudgets(req, res) {
 
     const budgets = await prisma.budget.findMany({
       include: {
-        category: true,
+        category: true
       },
       where: { userId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { startDate: "desc" },
     });
 
-    return res.status(200).json({ budgets });
+    const expenses = await prisma.expense.findMany({
+      select: {
+        userId: true,
+        categoryId: true,
+        expenseDate: true,
+        amount: true,
+      },
+      where: {
+        userId,
+      },
+    });
+
+    const budgetsWithExpenses = budgets.map(budget => {
+      const matchedExpenses = expenses.filter(expense =>
+        expense.userId === budget.userId &&
+        expense.categoryId === budget.categoryId &&
+        expense.expenseDate >= budget.startDate &&
+        expense.expenseDate <= budget.endDate
+      );
+
+      return {
+        ...budget,
+        expenses: matchedExpenses.map(expense => {
+          return {
+            amount: Number(expense.amount),
+            expenseDate: expense.expenseDate,
+          }
+        }),
+      };
+    });
+
+    return res.status(200).json({ budgets: budgetsWithExpenses });
   } catch (err) {
     console.error("getBudgets error:", err);
     return res.status(500).json({ error: "Server error." });

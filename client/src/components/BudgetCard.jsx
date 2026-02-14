@@ -11,6 +11,15 @@ export default function BudgetCard({ budget }) {
   const progressPercent =
     limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
 
+  // Set the color of the progress bar here based on progressPercent
+  let backgroundColor = "";
+  if (progressPercent >= 90)
+    backgroundColor = "#db3434";
+  else if (progressPercent >= 80)
+    backgroundColor = "#dbd034";
+  else
+    backgroundColor = "#19dd00";
+
   const start = budget.startDate
     ? new Date(budget.startDate).toLocaleDateString()
     : "—";
@@ -33,7 +42,7 @@ export default function BudgetCard({ budget }) {
       <div className="amounts">
         <p><strong>Limit:</strong> ${Number(limit).toLocaleString()}</p>
         <p><strong>Spent:</strong> ${Number(spent).toLocaleString()}</p>
-        <p><strong>Remaining:</strong> ${Number(remaining).toLocaleString()}</p>
+        <p style={{ color: `${backgroundColor}` }}><strong>Remaining:</strong> ${Number(remaining).toLocaleString()}</p>
       </div>
 
       <div className="dates">
@@ -44,7 +53,7 @@ export default function BudgetCard({ budget }) {
       <div className="progress-bar" aria-label="Budget progress">
         <div
           className="progress-fill"
-          style={{ width: `${progressPercent}%` }}
+          style={{ width: `${progressPercent}%`, backgroundColor: `${backgroundColor}` }}
         />
       </div>
     </div>

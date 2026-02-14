@@ -102,12 +102,12 @@ export default function BudgetForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>{isEditMode ? "Edit Budget" : "Set Your Budget"}</h2>
-
-      <label className="flex-label">
-        Category:
-        <select
+    <div className="form-wrapper">
+      <form onSubmit={handleSubmit}>
+        <h2>{isEditMode ? "Edit Budget" : "Set Your Budget"}</h2>
+        <div className="grid">
+          <label className="flex-label">Category:</label>
+          <select
             name="categoryId"
             value={selectedCategoryId}
             onChange={handleSelectChange}
@@ -120,64 +120,60 @@ export default function BudgetForm() {
               </option>
             ))}
           </select>
-      </label>
 
-      <label className="flex-label">
-        Limit:
-        <input
-          type="number"
-          min="0"
-          value={limit}
-          onChange={(e) => setLimit(e.target.value)}
-          required
-        />
-      </label>
-
-      <label className="flex-label">
-        Start date:
-        <input
-          type="date"
-          name="date"
-          value={startDate}
-          onChange={(event) => setStartDate(event.target.value)}
-          required
-        />
-      </label>
-
-      <fieldset>
-        <legend>Period</legend>
-
-        <label>
+          <label className="flex-label">Limit:</label>
           <input
-            type="radio"
-            value="weekly"
-            checked={period === "weekly"}
-            onChange={() => setPeriod("weekly")}
+            type="number"
+            min="0"
+            value={limit}
+            onChange={(e) => setLimit(e.target.value)}
+            required
           />
-          Weekly
-        </label>
 
-        <label>
+          <label className="flex-label">Start date:</label>
           <input
-            type="radio"
-            value="monthly"
-            checked={period === "monthly"}
-            onChange={() => setPeriod("monthly")}
+            type="date"
+            name="date"
+            value={startDate}
+            onChange={(event) => setStartDate(event.target.value)}
+            required
           />
-          Monthly
-        </label>
-      </fieldset>
+        </div>
+        <fieldset>
+          <legend>Period</legend>
 
-      <button disabled={loading}>
-        {loading
-          ? "Saving..."
-          : isEditMode
-            ? "Update Budget"
-            : "Save Budget"}
-      </button>
+          <label>
+            <input
+              type="radio"
+              value="weekly"
+              checked={period === "weekly"}
+              onChange={() => setPeriod("weekly")}
+            />
+            Weekly
+          </label>
 
-      {success && <p>Budget saved successfully!</p>}
-      {error && <p>{error}</p>}
-    </form>
+          <label>
+            <input
+              type="radio"
+              value="monthly"
+              checked={period === "monthly"}
+              onChange={() => setPeriod("monthly")}
+            />
+            Monthly
+          </label>
+        </fieldset>
+
+        <button disabled={loading}>
+          {loading
+            ? "Saving..."
+            : isEditMode
+              ? "Update Budget"
+              : "Save Budget"}
+        </button>
+
+        {success && <p>Budget saved successfully!</p>}
+        {error && <p>{error}</p>}
+      </form>
+    </div>
   );
 }

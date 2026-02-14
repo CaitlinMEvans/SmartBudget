@@ -4,14 +4,14 @@ export async function getActiveBudgets(userId) {
   try {
 
     // Search for a budget
-    const weeklyBudget = await prisma.budget.findFirst({ where: { 
+    const weeklyBudget = await prisma.budget.findMany({ where: { 
       userId, 
       period: 'weekly', 
       startDate: { lte: new Date().toISOString() },
       endDate: { gte: new Date().toISOString() },
     }})
 
-    const monthlyBudget = await prisma.budget.findFirst({ where: {
+    const monthlyBudget = await prisma.budget.findMany({ where: {
       userId, 
       period: 'monthly',
       startDate: { lte: new Date().toISOString() },
@@ -21,10 +21,10 @@ export async function getActiveBudgets(userId) {
     const returnedBudgets = [];
 
     if (weeklyBudget)
-      returnedBudgets.push(weeklyBudget);
+      weeklyBudget.forEach(budget => returnedBudgets.push(budget));
 
     if (monthlyBudget)
-      returnedBudgets.push(monthlyBudget);
+      monthlyBudget.forEach(budget => returnedBudgets.push(budget));
 
     return returnedBudgets;
   } 

@@ -23,7 +23,7 @@ export async function getDashboard(req, res) {
     =============================== */
 
     const totalBudget =
-      budgets?.reduce((sum, b) => sum + Number(b.amount), 0) || 0;
+      budgets?.reduce((sum, b) => sum + Number(b.limit), 0) || 0;
 
     const totalSpent =
       expenses?.reduce((sum, exp) => sum + Number(exp.amount), 0) || 0;

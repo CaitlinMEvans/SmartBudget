@@ -43,7 +43,7 @@ export default function Login() {
   }
 
   return (
-    <div style={{ maxWidth: 520, margin: "2rem auto" }}>
+    <div style={{ maxWidth: 520, margin: "2rem auto", display: "flex", flexDirection: "column", alignItems: "center" }}>
       <h1>Login</h1>
 
       {error && (
@@ -55,13 +55,14 @@ export default function Login() {
         </div>
       )}
 
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} style={{width: "100%"}}>
         <label>
           Email
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
+            style={{width: "100%"}}
           />
         </label>
 
@@ -72,6 +73,7 @@ export default function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
+            style={{width: "100%"}}
           />
         </label>
 

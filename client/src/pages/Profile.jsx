@@ -93,7 +93,7 @@ export default function Profile() {
 
       <h2 style={{ marginTop: 24 }}>Change Password</h2>
 
-      <form onSubmit={onChangePassword} style={{ marginTop: 12 }}>
+      <form onSubmit={onChangePassword} style={{ marginTop: 12, width: "100%" }}>
         <label style={{ display: "block", marginBottom: 12 }}>
           Current password
           <input

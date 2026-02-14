@@ -3,6 +3,7 @@ import { request } from "../api/authApi";
 import "./BudgetForm.css";
 import { useNavigate } from "react-router-dom";
 import categoryService from "../services/categoryService";
+import { useParams } from "react-router-dom";
 
 export default function BudgetForm() {
   const navigate = useNavigate();
@@ -15,14 +16,39 @@ export default function BudgetForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
+  
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
 
   useEffect(() => {
     categoryService.getAllCategories().then(categories => {
-      // Make sure the request sent back actual data
-      if (categories.length > 0)
-        setCategories(categories)
-    })
-  })
+      if (categories.length > 0) 
+        setCategories(categories);
+    });
+  }, []);
+
+
+  useEffect(() => {
+    if (!isEditMode) return;
+
+    async function loadBudget() {
+      try {
+        const budget = await request(`/budget/${id}`, null, "GET");
+
+        setSelectedCategoryId(budget.categoryId);
+        setLimit(budget.limit);
+        setPeriod(budget.period);
+        setStartDate(
+          new Date(budget.startDate).toISOString().split("T")[0]
+        );
+      } catch {
+        setError("Failed to load budget");
+      }
+    }
+
+    loadBudget();
+  }, [id, isEditMode]);
+
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -43,22 +69,27 @@ export default function BudgetForm() {
     setLoading(true);
 
     try {
+      const endpoint = isEditMode ? `/budget/${id}` : "/budget";
+      const method = isEditMode ? "PUT" : "POST";
+
+      const convertedStartDate = new Date(`${startDate}T00:00:00.000`);
+
       const data = await request(
-        "/budget",
+        endpoint,
         {
           categoryId: selectedCategoryId,
           limit: numericLimit,
           period,
-          startDate: new Date(startDate).toISOString(),
+          startDate: convertedStartDate,
         },
-        "POST"
+        method
       );
 
       setSuccess(true);
 
-      // Optional: route back to budgets after save
       setTimeout(() => navigate("/budget"), 400);
       return data;
+
     } catch (err) {
       setError(err?.message || "Failed to save budget");
     } finally {
@@ -72,7 +103,7 @@ export default function BudgetForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Set Your Budget</h2>
+      <h2>{isEditMode ? "Edit Budget" : "Set Your Budget"}</h2>
 
       <label className="flex-label">
         Category:
@@ -137,7 +168,13 @@ export default function BudgetForm() {
         </label>
       </fieldset>
 
-      <button disabled={loading}>{loading ? "Saving..." : "Save Budget"}</button>
+      <button disabled={loading}>
+        {loading
+          ? "Saving..."
+          : isEditMode
+            ? "Update Budget"
+            : "Save Budget"}
+      </button>
 
       {success && <p>Budget saved successfully!</p>}
       {error && <p>{error}</p>}

@@ -2,7 +2,11 @@ import BudgetCard from "./BudgetCard.jsx";
 import "./BudgetContainer.css";
 import { Link } from "react-router-dom";
 
-export default function BudgetContainer({ budgets }) {
+export default function BudgetContainer({ budgets, onDelete }) {
+  async function handleDelete(deleteId) {
+    onDelete(deleteId);
+  }
+
   if (!budgets || budgets.length === 0) {
     return (
       <div className="dashboard-empty">
@@ -20,7 +24,7 @@ export default function BudgetContainer({ budgets }) {
     <div className="dashboard-container">
       <div className="dashboard-pair">
         {budgets.map((budget) => (
-          <BudgetCard key={budget.id} budget={budget} />
+          <BudgetCard key={budget.id} budget={budget} onDelete={handleDelete} />
         ))}
       </div>
     </div>

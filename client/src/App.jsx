@@ -36,7 +36,15 @@ function App() {
               <AddBudget />
             </RequireAuth>
           } 
-        />     
+        />
+        <Route
+          path="/budget/:id/edit"
+          element={
+            <RequireAuth>
+              <AddBudget />
+            </RequireAuth>
+          }
+        />
         {/* Example protected route */}
 
         <Route

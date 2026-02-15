@@ -25,8 +25,10 @@ export default function Home() {
 
   return (
     <div style={{ padding: 16 }}>
-      <h1>SmartBudget Dashboard</h1>
-      <p>Quick Visual Summaries of your student spending with your created categories, expenses, and even budgets!</p>
+      <div style={{display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "1rem"}}>
+        <h1 style={{margin: 0}}>SmartBudget Dashboard</h1>
+        <p>Quick Visual Summaries of your student spending with your created categories, expenses, and even budgets!</p>
+      </div>
 
       {isAuthed ? (
         <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
@@ -34,7 +36,7 @@ export default function Home() {
           <BudgetContainer budgets={budgets} />
         </div>
       ) : (
-        <p>Please register or log in to continue.</p>
+        <p style={{textAlign: "center"}}>Please register or log in to continue.</p>
       )}
     </div>
   );

@@ -7,12 +7,20 @@ export default function Budget() {
   const [budgets, setBudgets] = useState([]);
 
   useEffect(() => {
-    request("/budget", null, "GET").then(allBudgets => {
+    request("/budget", null, "GET")
+      .then(allBudgets => {
       // Make sure the request sent back actual data
       if (allBudgets && allBudgets.budgets)
         setBudgets(allBudgets.budgets);
-    });
+      })
+      .catch(err => {
+        console.log("Error retrieving budgets.");
+      });
   }, [])
+
+  async function handleDelete(budgetId) {
+    setBudgets(budgets.filter(budget => budget.id !== budgetId));
+  }
 
   if (budgets.length <= 0) {
     return (
@@ -37,7 +45,7 @@ export default function Budget() {
       </div>
       <h1 style={{textAlign: "center"}}>All Budgets</h1>
       <div style={styles.budgetContainer}>
-        <BudgetContainer budgets={budgets}/>
+        <BudgetContainer budgets={budgets} onDelete={handleDelete}/>
       </div>
     </>
   )

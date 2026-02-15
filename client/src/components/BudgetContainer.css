@@ -14,3 +14,9 @@
   gap: 20px;
   flex-wrap: wrap;
 }
+
+.dashboard-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

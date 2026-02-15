@@ -1,20 +1,18 @@
 import { Link } from "react-router-dom";
 import { request } from "../api/authApi.js";
 import { useEffect, useState } from "react";
-import BudgetContainer from "../components/BudgetContainer.jsx"
+import BudgetContainer from "../components/BudgetContainer.jsx";
 
 export default function Budget() {
   const [budgets, setBudgets] = useState([]);
 
   useEffect(() => {
     request("/budget", null, "GET").then(allBudgets => {
-      setBudgets(allBudgets.budgets);
+      // Make sure the request sent back actual data
+      if (allBudgets && allBudgets.budgets)
+        setBudgets(allBudgets.budgets);
     });
   }, [])
-
-  function addBudget() {
-
-  }
 
   if (budgets.length <= 0) {
     return (
@@ -41,7 +39,6 @@ export default function Budget() {
       <div style={styles.budgetContainer}>
         <BudgetContainer budgets={budgets}/>
       </div>
-      {/* <BudgetForm></BudgetForm> */}
     </>
   )
 }

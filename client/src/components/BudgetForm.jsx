@@ -1,20 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { request } from "../api/authApi";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import "./BudgetForm.css";
 import { useNavigate } from "react-router-dom";
+import categoryService from "../services/categoryService";
 
 export default function BudgetForm() {
   const navigate = useNavigate();
 
-  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(0);
   const [limit, setLimit] = useState("");
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
   const [period, setPeriod] = useState("weekly");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    categoryService.getAllCategories().then(categories => {
+      // Make sure the request sent back actual data
+      if (categories.length > 0)
+        setCategories(categories)
+    })
+  })
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -22,8 +30,7 @@ export default function BudgetForm() {
     setSuccess(false);
 
     const numericLimit = Number(limit);
-
-    if (!category.trim()) {
+    if (!selectedCategoryId) {
       setError("Category is required.");
       return;
     }
@@ -39,10 +46,10 @@ export default function BudgetForm() {
       const data = await request(
         "/budget",
         {
-          category: category.trim(),
+          categoryId: selectedCategoryId,
           limit: numericLimit,
           period,
-          startDate: startDate.toISOString(),
+          startDate: new Date(startDate).toISOString(),
         },
         "POST"
       );
@@ -59,21 +66,32 @@ export default function BudgetForm() {
     }
   }
 
+  async function handleSelectChange(event) {
+    setSelectedCategoryId(Number(event.target.value));
+  }
+
   return (
     <form onSubmit={handleSubmit}>
       <h2>Set Your Budget</h2>
 
-      <label>
+      <label className="flex-label">
         Category:
-        <input
-          type="text"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          required
-        />
+        <select
+            name="categoryId"
+            value={selectedCategoryId}
+            onChange={handleSelectChange}
+            required
+          >
+            <option value="">Select category</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
       </label>
 
-      <label>
+      <label className="flex-label">
         Limit:
         <input
           type="number"
@@ -84,9 +102,15 @@ export default function BudgetForm() {
         />
       </label>
 
-      <label>
+      <label className="flex-label">
         Start date:
-        <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} />
+        <input
+          type="date"
+          name="date"
+          value={startDate}
+          onChange={(event) => setStartDate(event.target.value)}
+          required
+        />
       </label>
 
       <fieldset>

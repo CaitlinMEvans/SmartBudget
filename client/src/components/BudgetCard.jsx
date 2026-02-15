@@ -4,12 +4,21 @@ export default function BudgetCard({ budget }) {
   if (!budget) return null;
 
   const limit = Number.parseFloat(budget.limit ?? 0);
-  const spent = Number.parseFloat(budget.spent ?? 0);
+  const spent = Number.parseFloat(budget.expenses.reduce((sum, expense) => sum + expense.amount, 0) ?? 0);
 
   const remaining = limit - spent;
 
   const progressPercent =
     limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
+
+  // Set the color of the progress bar here based on progressPercent
+  let backgroundColor = "";
+  if (progressPercent >= 90)
+    backgroundColor = "#db3434";
+  else if (progressPercent >= 80)
+    backgroundColor = "#dbd034";
+  else
+    backgroundColor = "#19dd00";
 
   const start = budget.startDate
     ? new Date(budget.startDate).toLocaleDateString()
@@ -27,13 +36,13 @@ export default function BudgetCard({ budget }) {
     <div className="dashboard-card">
       <div className="dashboard-header">
         <h2>{budgetPeriodName} Budget</h2>
-        <span className="category">{budget.category ?? "Uncategorized"}</span>
+        <span className="category">{budget.category.name ?? "Uncategorized"}</span>
       </div>
 
       <div className="amounts">
         <p><strong>Limit:</strong> ${Number(limit).toLocaleString()}</p>
         <p><strong>Spent:</strong> ${Number(spent).toLocaleString()}</p>
-        <p><strong>Remaining:</strong> ${Number(remaining).toLocaleString()}</p>
+        <p style={{ color: `${backgroundColor}` }}><strong>Remaining:</strong> ${Number(remaining).toLocaleString()}</p>
       </div>
 
       <div className="dates">
@@ -44,7 +53,7 @@ export default function BudgetCard({ budget }) {
       <div className="progress-bar" aria-label="Budget progress">
         <div
           className="progress-fill"
-          style={{ width: `${progressPercent}%` }}
+          style={{ width: `${progressPercent}%`, backgroundColor: `${backgroundColor}` }}
         />
       </div>
     </div>

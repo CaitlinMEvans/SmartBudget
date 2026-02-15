@@ -4,8 +4,13 @@ form {
   gap: 4px;
 }
 
-label {
+.flex-label {
   display: flex;
   flex-direction: row;
   gap: 8px;
+}
+
+fieldset {
+  display: flex;
+  flex-direction: column;
 }

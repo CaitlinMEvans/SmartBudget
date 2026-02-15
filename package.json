@@ -3,7 +3,7 @@
     "dev": "concurrently -n \"SERVER,CLIENT\" -c \"blue,green\" \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
-    "seed": "node seed-student-budget.js"
+    "seed": "cd server && node seed-student-budget.js"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

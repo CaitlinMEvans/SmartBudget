@@ -1,6 +1,23 @@
 import "./BudgetCard.css";
+import { useNavigate } from "react-router-dom";
+import { request } from "../api/authApi";
 
-export default function BudgetCard({ budget }) {
+export default function BudgetCard({ budget, onDelete }) {
+  const navigate = useNavigate()
+  
+  async function editBudget() {
+    navigate(`/budget/${budget.id}/edit`);
+  }
+
+  async function deleteBudget() {
+    const confirmResponse = confirm("You are about to delete this budget. Please confirm that you'd like to delete it.");
+    if (!confirmResponse) return;
+    request(`/budget/${budget.id}`, null, "DELETE").then(() => {
+      navigate('/budget');
+      onDelete(budget.id);
+    });
+  }
+
   if (!budget) return null;
 
   const limit = Number.parseFloat(budget.limit ?? 0);
@@ -35,8 +52,13 @@ export default function BudgetCard({ budget }) {
   return (
     <div className="dashboard-card">
       <div className="dashboard-header">
-        <h2>{budgetPeriodName} Budget</h2>
-        <span className="category">{budget.category.name ?? "Uncategorized"}</span>
+          <h2>{budgetPeriodName} Budget</h2>
+          <span className="category">{budget.category.name ?? "Uncategorized"}</span>
+      </div>
+
+      <div className="edit-delete">
+        <button className="edit" onClick={editBudget}>Edit</button>
+        <button className="delete" onClick={deleteBudget}>Delete</button>
       </div>
 
       <div className="amounts">

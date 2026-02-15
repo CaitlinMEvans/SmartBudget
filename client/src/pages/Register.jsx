@@ -55,13 +55,14 @@ export default function Register() {
         </div>
       )}
 
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} style={{width: "100%"}}>
         <label>
           Email
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
+            style={{width: "100%"}}
           />
         </label>
 
@@ -72,6 +73,7 @@ export default function Register() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
+            style={{width: "100%"}}
           />
         </label>
 

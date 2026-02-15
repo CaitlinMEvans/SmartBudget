@@ -13,6 +13,7 @@ import "./Dashboard.css";
 
 const DashboardPage = () => {
   const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
   let isMounted = true;
@@ -25,6 +26,22 @@ const DashboardPage = () => {
       }
     } catch (err) {
       console.error("Dashboard fetch error:", err);
+      // If an error occurred, set empty data and display an error
+      const emptyData = {
+        "summary": {
+            "totalBudget": 0,
+            "totalSpent": 0,
+            "remaining": 0,
+            "expenseCount": 0
+        },
+        "budgets": [],
+        "expenses": [],
+        "recentExpenses": [],
+        "categoryTotals": {},
+        "weeklyTotals": []
+      }
+      setData(emptyData);
+      setError("There was an error loading the dashboard. Please try again.");
     }
   };
 
@@ -61,6 +78,7 @@ const DashboardPage = () => {
     <div className="dashboard">
 
       <h1>📊 SmartBudget Dashboard</h1>
+      {error && <h1 style={{color: "#ff0000"}}>{error}</h1>}
 
       {/* ========================= */}
       {/* SUMMARY CARDS */}

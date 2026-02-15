@@ -21,12 +21,30 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
 }
 
 .dashboard-header h2 {
   font-size: 1.4rem;
   color: #333;
+}
+
+.edit-delete {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  margin: 5px 0;
+}
+
+.edit:hover {
+  background-color: #146ba5;
+}
+
+.delete {
+  background-color: #db3434;
+}
+
+.delete:hover {
+  background-color: #861919;
 }
 
 .category {

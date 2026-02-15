@@ -61,6 +61,7 @@ button {
   display: grid;
   gap: 1rem;
   animation: slideDown 0.3s ease-out;
+  width: 100%;
 }
 
 @keyframes slideDown {
